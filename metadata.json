@@ -1,0 +1,6 @@
+{
+  "name": "ASSGA - Associação dos Surdos",
+  "description": "Portal oficial da ASSGA (Associação dos Surdos): história, estatuto social, diretoria, departamento esportivo, eventos, emissão e impressão de carteirinha de sócio, pagamentos e área do associado.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

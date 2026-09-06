@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Início - ASSGA Associação dos Surdos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Banner com Identidade Visual -->
+    <div class="p-5 mb-4 bg-light rounded-4 border shadow-sm" style="background: linear-gradient(135deg, #003366 0%, #004aad 100%); color: white;">
+        <div class="container-fluid py-3">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
+                        <i class="fa-solid fa-hands-asl-interpreting me-1"></i> Comunidade Surda Potiguar
+                    </span>
+                    <h1 class="display-5 fw-bold text-white mb-3">ASSGA - Associação dos Surdos</h1>
+                    <p class="col-md-10 fs-5 text-light opacity-90">
+                        Promovendo inclusão, cidadania, direitos linguísticos em LIBRAS e excelência no desporto dos surdos em São Gonçalo do Amarante e região.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a href="{% url 'core:carteirinha' %}" class="btn btn-warning btn-lg fw-bold px-4">
+                            <i class="fa-solid fa-id-card me-2"></i> Emitir Carteirinha
+                        </a>
+                        <a href="{% url 'core:pagamento' %}" class="btn btn-outline-light btn-lg px-4">
+                            <i class="fa-brands fa-pix me-2"></i> Mensalidade PIX
+                        </a>
+                        <a href="{% url 'core:esportiva' %}" class="btn btn-light btn-lg px-4 text-primary fw-semibold">
+                            <i class="fa-solid fa-trophy me-2"></i> Esportes
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                    <div class="card bg-white text-dark p-3 rounded-4 shadow border-0">
+                        <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-bullhorn me-1"></i> Comunicado Oficial</h6>
+                        <p class="small mb-3 text-muted">Acesse a emissão e impressão da nova carteirinha de sócio com validação eletrônica por QR Code.</p>
+                        <a href="{% url 'core:login' %}" class="btn btn-primary btn-sm fw-bold">Área do Associado</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Destaques em Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-3 hover-shadow">
+                <div class="card-body p-4">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-trophy fs-4"></i>
+                    </div>
+                    <h5 class="card-title fw-bold text-primary">Desporto de Surdos</h5>
+                    <p class="card-text text-muted">Modalidades como futsal masculino e feminino, voleibol e atletismo, com treinos regulares e participação em torneios estaduais e nacionais.</p>
+                    <a href="{% url 'core:esportiva' %}" class="btn btn-link text-primary p-0 fw-bold">Conhecer Modalidades &rarr;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <div class="bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-scale-balanced fs-4"></i>
+                    </div>
+                    <h5 class="card-title fw-bold text-dark">Estatuto Social</h5>
+                    <p class="card-text text-muted">Conheça os direitos e deveres dos associados, estrutura da diretoria, conselho fiscal e objetivos estatutários da entidade.</p>
+                    <a href="{% url 'core:estatuto' %}" class="btn btn-link text-dark p-0 fw-bold">Ler Estatuto &rarr;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-id-card fs-4"></i>
+                    </div>
+                    <h5 class="card-title fw-bold text-success">Carteirinha Digital</h5>
+                    <p class="card-text text-muted">Identificação oficial com código de autenticação, comprovante de filiação e modelo pronto para impressão frente e verso.</p>
+                    <a href="{% url 'core:carteirinha' %}" class="btn btn-link text-success p-0 fw-bold">Ver Carteirinha &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Próximos Eventos -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-primary mb-0"><i class="fa-solid fa-calendar-days me-2"></i>Próximos Eventos</h3>
+            <a href="{% url 'core:eventos' %}" class="btn btn-outline-primary btn-sm">Ver Todos</a>
+        </div>
+        <div class="row g-4">
+            {% for evento in eventos %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border shadow-sm rounded-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary">{{ evento.tipo }}</span>
+                            {% if evento.libras_disponivel %}
+                            <span class="badge bg-info text-dark"><i class="fa-solid fa-hands-asl-interpreting me-1"></i>LIBRAS</span>
+                            {% endif %}
+                        </div>
+                        <h5 class="card-title fw-bold">{{ evento.titulo }}</h5>
+                        <p class="text-muted small mb-2"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ evento.data_inicio|date:"d/m/Y - H:i" }}</p>
+                        <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ evento.local }}</p>
+                        <p class="card-text text-secondary small">{{ evento.descricao|truncatewords:20 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-light border text-center py-4">Nenhum evento agendado no momento. Fique atento às nossas redes!</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/data.js": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*\\.(?:jpg|jpeg|png|webp|gif|ico|svg|css|js))",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, s-maxage=86400" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    },
+    {
+      "source": "/(.*\\.html)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/welcome", "destination": "/api/welcome" },
+    { "source": "/historia", "destination": "/historia.html" },
+    { "source": "/esportiva", "destination": "/esportiva.html" },
+    { "source": "/estatuto", "destination": "/estatuto.html" },
+    { "source": "/evento", "destination": "/evento.html" },
+    { "source": "/diretoria", "destination": "/diretoria.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/admin", "destination": "/admin.html" }
+  ]
+}

@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Gestão de Todos os Cadastros | ASSGA</title>
+    <link rel="icon" href="src/imagens/Assga_foto.jpg" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: #f0f4f8; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #003366, #004aad);
+            color: #fff;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 14px rgba(0,0,0,.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-logo { display: flex; align-items: center; gap: 12px; }
+        .header-logo img {
+            width: 44px;
+        }
+        .header-logo h1 { font-size: 19px; font-weight: 800; color: #ffd700; letter-spacing: .5px; }
+        .header-logo span { font-size: 12px; color: #e2e8f0; display: block; font-weight: normal; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .header-actions a, .header-actions button {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.16);
+            border: 1px solid rgba(255,255,255,.25);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: .25s;
+        }
+        .header-actions a:hover, .header-actions button:hover { background: #ffd700; color: #003366; border-color: #ffd700; }
+
+        /* LAYOUT */
+        .admin-layout { display: flex; flex: 1; max-width: 1480px; width: 100%; margin: 20px auto; padding: 0 16px; gap: 20px; }
+        .sidebar { width: 270px; background: #fff; border-radius: 16px; padding: 18px 14px; box-shadow: 0 4px 15px rgba(0,0,0,.05); height: fit-content; position: sticky; top: 85px; }
+        .sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; padding: 8px 12px 4px; letter-spacing: .8px; }
+        .sidebar ul { list-style: none; margin-bottom: 12px; }
+        .sidebar li { margin-bottom: 4px; }
+        .sidebar button {
+            width: 100%;
+            text-align: left;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all .2s;
+        }
+        .sidebar button .btn-content { display: flex; align-items: center; gap: 10px; }
+        .sidebar button i { font-size: 15px; color: #004aad; width: 18px; text-align: center; }
+        .sidebar button.active, .sidebar button:hover { background: #e8f0fe; color: #003366; }
+        .sidebar button.active { font-weight: 700; border-left: 4px solid #004aad; }
+        .sidebar-badge { font-size: 11px; background: #e2e8f0; color: #475569; padding: 2px 7px; border-radius: 10px; font-weight: 700; }
+        .sidebar button.active .sidebar-badge { background: #004aad; color: #fff; }
+
+        /* CONTENT */
+        .content-area { flex: 1; background: #fff; border-radius: 16px; padding: 28px; box-shadow: 0 4px 15px rgba(0,0,0,.05); min-width: 0; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn .25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HEADINGS */
+        .tab-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid #eef2f6; }
+        h2 { color: #003366; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; font-weight: 800; }
+        h2 i { color: #004aad; }
+        .tab-desc { color: #64748b; font-size: 13.5px; margin-top: 3px; }
+
+        /* METRICS */
+        .card-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 25px; }
+        .card-stat { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; text-align: left; transition: transform .2s, box-shadow .2s; }
+        .card-stat:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.06); }
+        .card-stat-top { display: flex; justify-content: space-between; align-items: center; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .card-stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .card-stat strong { display: block; font-size: 2.1rem; color: #003366; margin-top: 8px; font-weight: 900; line-height: 1.1; }
+
+        /* FORMS */
+        .admin-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 24px; }
+        .admin-card-title { margin-bottom: 16px; color: #003366; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 700; margin-bottom: 6px; color: #334155; font-size: 13px; }
+        .form-group .help-text { font-size: 11px; color: #64748b; margin-top: 3px; }
+        .form-control { width: 100%; padding: 9px 13px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; background: #fff; color: #1e293b; transition: border-color .2s; }
+        .form-control:focus { outline: none; border-color: #004aad; box-shadow: 0 0 0 3px rgba(0,74,173,.15); }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+
+        /* BUTTONS */
+        .btn { padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; border: none; transition: .2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-primary { background: #003366; color: #fff; }
+        .btn-primary:hover { background: #004aad; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover { background: #15803d; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-warning { background: #eab308; color: #78350f; }
+        .btn-warning:hover { background: #ca8a04; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+
+        /* TABLES */
+        .table-responsive { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; font-size: 13px; vertical-align: middle; }
+        th { background: #f8fafc; color: #475569; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #f8fafc; }
+
+        /* BADGES */
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-warning { background: #fef9c3; color: #a16207; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+
+        /* SEARCH BAR */
+        .search-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .search-input-wrap { flex: 1; min-width: 240px; position: relative; }
+        .search-input-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .search-input-wrap input { padding-left: 36px; }
+
+        /* SLIDER MANAGEMENT CARDS */
+        .slider-manage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-top: 15px; }
+        .slider-item-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.04); transition: .2s; position: relative; }
+        .slider-item-card:hover { border-color: #004aad; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,74,173,.12); }
+        .slider-item-thumb { height: 160px; width: 100%; position: relative; background: #003366; overflow: hidden; }
+        .slider-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .slider-item-pos { position: absolute; top: 8px; left: 8px; background: rgba(0,51,102,.85); color: #ffd700; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 8px; border: 1px solid #ffd700; }
+        .slider-item-body { padding: 14px; }
+        .slider-item-title { font-size: 14px; font-weight: 700; color: #003366; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px; }
+        .slider-item-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+        /* MENSALIDADES SELECTOR (SÓCIOS) */
+        .meses-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; }
+        .mes-btn { padding: 4px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #64748b; cursor: pointer; text-align: center; }
+        .mes-btn.pago { background: #16a34a; color: #fff; border-color: #15803d; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,.3); }
+        .modal-header { padding: 16px 22px; background: #003366; color: #fff; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
+        .modal-header h3 { font-size: 16px; color: #ffd700; display: flex; align-items: center; gap: 8px; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+        .modal-body { padding: 22px; }
+        .admin-auth { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at top right, #dbe9f8, #eef3f8 48%); }
+        .admin-auth-box { width: min(420px, 100%); padding: 36px; background: #fff; border-radius: 18px; box-shadow: 0 18px 50px rgba(0,51,102,.14); text-align: center; }
+        .admin-auth-box img { width: 76px; height: 76px; object-fit: cover; border-radius: 12px; margin-bottom: 14px; }
+        .admin-auth-box h1 { color: #003366; font-size: 1.6rem; margin-bottom: 8px; }
+        .admin-auth-box p { color: #667085; margin-bottom: 22px; }
+        .admin-auth-box input { width: 100%; padding: 13px 15px; border: 1px solid #d9e1eb; border-radius: 9px; font-size: 1rem; margin-bottom: 14px; }
+        .admin-auth-box button { width: 100%; padding: 13px; border: 0; border-radius: 9px; background: #003366; color: #fff; font-weight: 700; cursor: pointer; }
+        .admin-auth-box button:hover { background: #004aad; }
+        .admin-auth-error { display: none; color: #b42318; font-weight: 600; font-size: .9rem; margin-top: 12px; }
+        body.admin-locked > header, body.admin-locked > .admin-layout, body.admin-locked > footer { display: none; }
+        body.admin-unlocked > .admin-auth { display: none; }
+
+        @media (max-width: 900px) {
+            .admin-layout { flex-direction: column; }
+            .sidebar { width: 100%; position: static; }
+            .content-area { padding: 18px; }
+        }
+    </style>
+    <script src="/brand.js"></script>
+    <script src="/api-sync.js"></script>
+</head>
+<body class="admin-locked">
+    <section class="admin-auth" id="adminAuth" aria-labelledby="adminAuthTitle">
+        <form class="admin-auth-box" id="adminAuthForm">
+            <img src="src/imagens/Assga_foto.jpg" alt="ASSGA">
+            <h1 id="adminAuthTitle">Acesso Administrativo</h1>
+            <p>Informe a senha da diretoria para acessar o painel.</p>
+            <input type="password" id="adminPassword" placeholder="Senha administrativa" autocomplete="current-password" required>
+            <button type="submit"><i class="fas fa-lock-open"></i> Entrar no painel</button>
+            <div class="admin-auth-error" id="adminAuthError" role="alert">Senha administrativa inválida.</div>
+            <a href="/" style="display:inline-block;margin-top:16px;color:#004aad;text-decoration:none;">Voltar ao site</a>
+        </form>
+    </section>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-logo">
+            <img src="src/imagens/Assga_foto.jpg" alt="ASSGA" onerror="this.src='src/imagens/foto1.jpg'">
+            <div>
+                <h1>ASSGA • Painel de Gestão Completa</h1>
+                <span>Gestão Integrada de Todos os Cadastros</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="/" target="_blank"><i class="fas fa-eye"></i> Ver Site</a>
+            <a href="/login" target="_blank"><i class="fas fa-id-badge"></i> Área do Sócio</a>
+            <button type="button" onclick="exportarBackup()"><i class="fas fa-download"></i> Backup</button>
+            <button type="button" onclick="sairAdmin()"><i class="fas fa-right-from-bracket"></i> Sair</button>
+        </div>
+    </header>
+
+    <!-- LAYOUT PRINCIPAL -->
+    <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Painel de Controle</div>
+            <ul>
+                <li>
+                    <button class="active" onclick="showTab('tab-dashboard')">
+                        <span class="btn-content"><i class="fas fa-gauge-high"></i> Visão Geral</span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="sidebar-title">Todos os Cadastros</div>
+            <ul>
+                <li>
+                    <button onclick="showTab('tab-slider')">
+                        <span class="btn-content"><i class="fas fa-images"></i> Fotos do Momento</span>
+                        <span class="sidebar-badge" id="badgeSlider">3</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-socios')">
+                        <span class="btn-content"><i class="fas fa-id-card"></i> Sócios & Carteirinhas</span>
+                        <span class="sidebar-badge" id="badgeSocios">0</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-inscricoes')">
+                        <span class="btn-content"><i class="fas fa-ticket"></i> Inscrições & Vagas</span>
+                        <span class="sidebar-badge" id="badgeInscricoes">0</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-noticias')">
+                        <span class="btn-content"><i class="fas fa-newspaper"></i> Notícias & Blog</span>
+                        <span class="sidebar-badge" id="badgeNoticias">0</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-eventos')">
+                        <span class="btn-content"><i class="fas fa-calendar-days"></i> Eventos</span>
+                        <span class="sidebar-badge" id="badgeEventos">0</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-momentos')">
+                        <span class="btn-content"><i class="fas fa-landmark"></i> Marcos Históricos</span>
+                        <span class="sidebar-badge" id="badgeMomentos">0</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-diretoria')">
+                        <span class="btn-content"><i class="fas fa-users-gear"></i> Diretoria Executiva</span>
+                        <span class="sidebar-badge" id="badgeDiretoria">0</span>
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showTab('tab-config')">
+                        <span class="btn-content"><i class="fas fa-sliders"></i> Dados da Associação</span>
+                    </button>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- ÁREA DE CONTEÚDO -->
+        <main class="content-area">
+
+            <!-- TAB 1: VISÃO GERAL -->
+            <div id="tab-dashboard" class="tab-panel active">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-gauge-high"></i> Visão Geral da ASSGA</h2>
+                        <div class="tab-desc">Monitoramento e estatísticas em tempo real de todos os cadastros</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="restaurarPadraoAssga()"><i class="fas fa-rotate"></i> Carregar Dados Demonstrativos</button>
+                </div>
+
+                <div class="card-stat-grid">
+                    <div class="card-stat">
+                        <div class="card-stat-top">
+                            <span>Fotos do Momento</span>
+                            <div class="card-stat-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-images"></i></div>
+                        </div>
+                        <strong id="statSlider">0</strong>
+                    </div>
+                    <div class="card-stat">
+                        <div class="card-stat-top">
+                            <span>Sócios Cadastrados</span>
+                            <div class="card-stat-icon" style="background:#dcfce7; color:#15803d;"><i class="fas fa-id-card"></i></div>
+                        </div>
+                        <strong id="statSocios">0</strong>
+                    </div>
+                    <div class="card-stat">
+                        <div class="card-stat-top">
+                            <span>Vagas Ocupadas</span>
+                            <div class="card-stat-icon" style="background:#fef9c3; color:#a16207;"><i class="fas fa-ticket"></i></div>
+                        </div>
+                        <strong id="statVagas">0/100</strong>
+                    </div>
+                    <div class="card-stat">
+                        <div class="card-stat-top">
+                            <span>Notícias Ativas</span>
+                            <div class="card-stat-icon" style="background:#f3e8ff; color:#7e22ce;"><i class="fas fa-newspaper"></i></div>
+                        </div>
+                        <strong id="statNoticias">0</strong>
+                    </div>
+                    <div class="card-stat">
+                        <div class="card-stat-top">
+                            <span>Eventos Programados</span>
+                            <div class="card-stat-icon" style="background:#ffe4e6; color:#be123c;"><i class="fas fa-calendar-days"></i></div>
+                        </div>
+                        <strong id="statEventos">0</strong>
+                    </div>
+                </div>
+
+                <!-- ATALHOS RÁPIDOS -->
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-bolt"></i> Ações Rápidas de Cadastro</div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-secondary" onclick="showTab('tab-slider')"><i class="fas fa-plus"></i> Nova Foto do Momento</button>
+                        <button class="btn btn-secondary" onclick="showTab('tab-socios')"><i class="fas fa-user-plus"></i> Novo Sócio</button>
+                        <button class="btn btn-secondary" onclick="showTab('tab-inscricoes')"><i class="fas fa-ticket"></i> Nova Inscrição</button>
+                        <button class="btn btn-secondary" onclick="showTab('tab-noticias')"><i class="fas fa-newspaper"></i> Nova Notícia</button>
+                        <button class="btn btn-secondary" onclick="showTab('tab-eventos')"><i class="fas fa-calendar-plus"></i> Novo Evento</button>
+                    </div>
+                </div>
+
+                <div style="background:#eef2f6; border-radius:12px; padding:18px; color:#475569; font-size:13px; line-height:1.6;">
+                    <strong style="color:#003366;"><i class="fas fa-circle-check"></i> Sincronização Imediata:</strong> Todas as alterações realizadas nas abas laterais são refletidas de forma instantânea nas páginas do site oficial da ASSGA (`index.html`, `historia.html`, `carteirinha-impressa.html`, etc.).
+                </div>
+            </div>
+
+            <!-- TAB 2: FOTOS DO MOMENTO (SLIDER) -->
+            <div id="tab-slider" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-images"></i> Gerenciar Fotos do Momento (Slider)</h2>
+                        <div class="tab-desc">Controle quais fotos e legendas aparecem no slider principal da página inicial</div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetarSliderPadrao()"><i class="fas fa-rotate"></i> Restaurar Fotos Padrão</button>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-plus-circle"></i> Adicionar Nova Foto do Momento</div>
+                    <form id="formSlider" onsubmit="salvarFotoSlider(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Legenda / Descrição do Momento</label>
+                                <input type="text" id="sliderTexto" class="form-control" required placeholder="Ex: Torneio de Futsal da ASSGA 2026">
+                            </div>
+                            <div class="form-group">
+                                <label>Caminho da Imagem ou URL</label>
+                                <input type="text" id="sliderImagem" class="form-control" placeholder="src/imagens/foto2.jpg">
+                                <div class="help-text" style="margin-top:6px;">
+                                    <strong>Fotos reais da ASSGA (clique para aplicar):</strong>
+                                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('sliderImagem').value='src/imagens/foto2.jpg'; document.getElementById('sliderTexto').value='Equipe Oficial de Futsal da ASSGA - Conquistas e Esporte';"><i class="fas fa-trophy"></i> Futsal (foto2)</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('sliderImagem').value='src/imagens/foto1.jpg'; document.getElementById('sliderTexto').value='Confraternização e União da Comunidade ASSGA';"><i class="fas fa-users"></i> Confraternização (foto1)</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('sliderImagem').value='src/imagens/foto3 (1).jpg'; document.getElementById('sliderTexto').value='Atletas e Treinos da Associação Desportiva ASSGA';"><i class="fas fa-running"></i> Treino (foto3)</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('sliderImagem').value='src/imagens/halloween-assga.jpeg'; document.getElementById('sliderTexto').value='2º Festa de Halloween do ASSGA - 28 e 29 de Novembro';"><i class="fas fa-ghost"></i> Halloween</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('sliderImagem').value='src/imagens/Assga_foto.jpg'; document.getElementById('sliderTexto').value='ASSGA - Associação de Surdos de São Gonçalo do Amarante';"><i class="fas fa-shield-alt"></i> Logo ASSGA</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Ou Envie uma Foto do Computador</label>
+                                <input type="file" id="sliderFile" class="form-control" accept="image/*" onchange="processarUploadImagem(event, 'sliderImagem')">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Cadastrar Foto do Momento</button>
+                    </form>
+                </div>
+
+                <h3 style="color:#003366; font-size:16px; margin-bottom:12px;"><i class="fas fa-list"></i> Fotos Cadastradas no Momento (<span id="totalSliderCount">0</span>)</h3>
+                <div class="slider-manage-grid" id="listaSliderCards"></div>
+            </div>
+
+            <!-- TAB 3: SÓCIOS & CARTEIRINHAS -->
+            <div id="tab-socios" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-id-card"></i> Gerenciamento de Sócios & Carteirinhas</h2>
+                        <div class="tab-desc">Cadastro de associados, controle de mensalidades pagas e emissão de carteirinhas</div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-user-plus"></i> Cadastrar Novo Sócio</div>
+                    <form id="formSocio" onsubmit="salvarSocio(event)">
+                        <input type="hidden" id="socioEditIdx" value="-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nome Completo</label>
+                                <input type="text" id="socioNome" class="form-control" required placeholder="Ex: Maria dos Santos">
+                            </div>
+                            <div class="form-group">
+                                <label>CPF (para Login na Área do Sócio)</label>
+                                <input type="text" id="socioCpf" class="form-control" required placeholder="000.000.000-00" oninput="mascaraCPF(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Nascimento</label>
+                                <input type="text" id="socioNascimento" class="form-control" placeholder="DD/MM/AAAA">
+                            </div>
+                            <div class="form-group">
+                                <label>Nº de Matrícula</label>
+                                <input type="text" id="socioMatricula" class="form-control" placeholder="Ex: 001/2026">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefone / WhatsApp</label>
+                                <input type="text" id="socioTelefone" class="form-control" placeholder="(84) 99999-9999">
+                            </div>
+                            <div class="form-group">
+                                <label>Categoria do Sócio</label>
+                                <select id="socioCategoria" class="form-control">
+                                    <option value="Sócio Efetivo">Sócio Efetivo</option>
+                                    <option value="Sócio Atleta">Sócio Atleta</option>
+                                    <option value="Sócio Contribuinte">Sócio Contribuinte</option>
+                                    <option value="Sócio Benemérito">Sócio Benemérito</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Senha de Acesso</label>
+                                <input type="password" id="socioSenha" class="form-control" placeholder="Padrão: 123456">
+                            </div>
+                            <div class="form-group">
+                                <label>Foto do Sócio (URL ou Upload)</label>
+                                <input type="file" id="socioFotoFile" class="form-control" accept="image/*" onchange="processarUploadImagem(event, 'socioFotoUrl')">
+                                <input type="hidden" id="socioFotoUrl" value="src/imagens/avatar-padrao.jpg">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn btn-primary" id="btnSalvarSocio"><i class="fas fa-plus"></i> Salvar Sócio</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarSocio" style="display:none;" onclick="cancelarEdicaoSocio()">Cancelar Edição</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="search-bar">
+                    <div class="search-input-wrap">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input type="text" id="buscaSocio" class="form-control" placeholder="Buscar sócio por Nome, CPF ou Matrícula..." oninput="filtrarSocios()">
+                    </div>
+                    <span id="contadorSocios" style="font-size:13px; color:#64748b; font-weight:700;"></span>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Matrícula</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Categoria</th>
+                                <th>Mensalidades (JAN-DEZ)</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaSocios"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: INSCRIÇÕES & VAGAS -->
+            <div id="tab-inscricoes" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-ticket"></i> Inscrições & Vagas (Halloween ASSGA)</h2>
+                        <div class="tab-desc">Gestão de participantes, pagamentos e limite de 100 vagas</div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-secondary" onclick="exportarInscricoesCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                        <button class="btn btn-danger" onclick="limparInscricoes()"><i class="fas fa-trash"></i> Resetar Lista</button>
+                    </div>
+                </div>
+
+                <!-- ADICIONAR INSCRIÇÃO MANUAL -->
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-plus"></i> Nova Inscrição Manual</div>
+                    <form id="formInscricaoManual" onsubmit="salvarInscricaoManual(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nome do Participante</label>
+                                <input type="text" id="inscNome" class="form-control" required placeholder="Ex: Carlos Alberto">
+                            </div>
+                            <div class="form-group">
+                                <label>CPF</label>
+                                <input type="text" id="inscCpf" class="form-control" required placeholder="000.000.000-00" oninput="mascaraCPF(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>WhatsApp</label>
+                                <input type="text" id="inscWhats" class="form-control" required placeholder="(84) 99999-9999">
+                            </div>
+                            <div class="form-group">
+                                <label>Forma de Pagamento</label>
+                                <select id="inscPagamento" class="form-control">
+                                    <option value="PIX">PIX</option>
+                                    <option value="DINHEIRO">Dinheiro</option>
+                                    <option value="CARTÃO">Cartão</option>
+                                    <option value="ISENTO">Isento</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor (R$)</label>
+                                <input type="number" id="inscValor" class="form-control" value="50" step="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="inscStatus" class="form-control">
+                                    <option value="PENDENTE">PENDENTE</option>
+                                </select>
+                                <small style="display:block; margin-top:6px; color:#64748b;">A inscrição só fica ativa depois da confirmação do pagamento.</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-ticket"></i> Confirmar Inscrição</button>
+                    </form>
+                </div>
+
+                <div class="search-bar">
+                    <div class="search-input-wrap">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input type="text" id="buscaInscricao" class="form-control" placeholder="Buscar inscrito por Nome, CPF ou Código..." oninput="filtrarInscricoes()">
+                    </div>
+                    <select id="filtroStatusInscricao" class="form-control" style="width:160px;" onchange="filtrarInscricoes()">
+                        <option value="TODOS">Todos os Status</option>
+                        <option value="PAGO">Somente Pagos</option>
+                        <option value="PENDENTE">Somente Pendentes</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vaga</th>
+                                <th>Código</th>
+                                <th>Participante</th>
+                                <th>CPF</th>
+                                <th>WhatsApp</th>
+                                <th>Forma / Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaInscricoes"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 5: NOTÍCIAS & BLOG -->
+            <div id="tab-noticias" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-newspaper"></i> Notícias & Comunicações</h2>
+                        <div class="tab-desc">Publicações e novidades que aparecem na página inicial da ASSGA</div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-pen-to-square"></i> Publicar Nova Notícia</div>
+                    <form id="formNoticia" onsubmit="salvarNoticia(event)">
+                        <input type="hidden" id="noticiaEditIdx" value="-1">
+                        <div class="form-group">
+                            <label>Título da Notícia</label>
+                            <input type="text" id="noticiaTitulo" class="form-control" required placeholder="Ex: ASSGA Conquista Troféu no Campeonato Regional">
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Categoria</label>
+                                <select id="noticiaCategoria" class="form-control">
+                                    <option value="Esporte">Esporte</option>
+                                    <option value="Institucional">Institucional</option>
+                                    <option value="Eventos">Eventos</option>
+                                    <option value="Comunidade">Comunidade Surda</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Imagem da Notícia (URL ou caminho)</label>
+                                <input type="text" id="noticiaImagem" class="form-control" placeholder="src/imagens/foto1.jpg">
+                                <div class="help-text" style="margin-top:6px;">
+                                    <small>Fotos da ASSGA (clique para escolher):</small>
+                                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:4px;">
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('noticiaImagem').value='src/imagens/foto2.jpg'"><i class="fas fa-trophy"></i> Futsal (foto2)</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('noticiaImagem').value='src/imagens/foto1.jpg'"><i class="fas fa-users"></i> Confraternização (foto1)</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('noticiaImagem').value='src/imagens/foto3 (1).jpg'"><i class="fas fa-running"></i> Treinos (foto3)</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('noticiaImagem').value='src/imagens/halloween-assga.jpeg'"><i class="fas fa-ghost"></i> Halloween</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('noticiaImagem').value='src/imagens/Assga_foto.jpg'"><i class="fas fa-shield-alt"></i> Brasão</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Ou Enviar Foto</label>
+                                <input type="file" id="noticiaFotoFile" class="form-control" accept="image/*" onchange="processarUploadImagem(event, 'noticiaImagem')">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Conteúdo Completo</label>
+                            <textarea id="noticiaTexto" class="form-control" rows="4" required placeholder="Digite o texto detalhado da notícia..."></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn btn-primary" id="btnSalvarNoticia"><i class="fas fa-paper-plane"></i> Publicar Notícia</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarNoticia" style="display:none;" onclick="cancelarEdicaoNoticia()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="listaNoticiasAdmin"></div>
+            </div>
+
+            <!-- TAB 6: EVENTOS -->
+            <div id="tab-eventos" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-calendar-days"></i> Gerenciamento de Eventos</h2>
+                        <div class="tab-desc">Cadastre torneios, comemorações e workshops da comunidade</div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-calendar-plus"></i> Cadastrar Novo Evento</div>
+                    <form id="formEvento" onsubmit="salvarEvento(event)">
+                        <input type="hidden" id="eventoEditIdx" value="-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Título do Evento</label>
+                                <input type="text" id="eventoTitulo" class="form-control" required placeholder="Ex: 2º Torneio Futsal dos Surdos">
+                            </div>
+                            <div class="form-group">
+                                <label>Data e Horário</label>
+                                <input type="text" id="eventoData" class="form-control" placeholder="Ex: 28 e 29 de novembro, às 08h">
+                            </div>
+                            <div class="form-group">
+                                <label>Local</label>
+                                <input type="text" id="eventoLocal" class="form-control" placeholder="Ginásio Poliesportivo de São Gonçalo">
+                            </div>
+                            <div class="form-group">
+                                <label>Preço / Inscrição (R$)</label>
+                                <input type="text" id="eventoPreco" class="form-control" placeholder="Ex: 50,00 ou Gratuito">
+                            </div>
+                            <div class="form-group">
+                                <label>Status do Evento</label>
+                                <select id="eventoStatus" class="form-control">
+                                    <option value="Aberto">Inscrições Abertas</option>
+                                    <option value="Em Breve">Em Breve</option>
+                                    <option value="Encerrado">Encerrado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Imagem do Evento</label>
+                                <input type="text" id="eventoImagem" class="form-control" placeholder="src/imagens/halloween-assga.jpeg">
+                                <div class="help-text" style="margin-top:6px;">
+                                    <small>Fotos da ASSGA (clique para escolher):</small>
+                                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:4px;">
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('eventoImagem').value='src/imagens/halloween-assga.jpeg'"><i class="fas fa-ghost"></i> Halloween</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('eventoImagem').value='src/imagens/foto2.jpg'"><i class="fas fa-trophy"></i> Futsal</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('eventoImagem').value='src/imagens/foto3 (1).jpg'"><i class="fas fa-running"></i> Treinos</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('eventoImagem').value='src/imagens/foto1.jpg'"><i class="fas fa-users"></i> Confraternização</button>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('eventoImagem').value='src/imagens/Assga_foto.jpg'"><i class="fas fa-shield-alt"></i> Brasão</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Link do botão de inscrição</label>
+                                <input type="text" id="eventoLink" class="form-control" placeholder="https://exemplo.com/inscricao ou pagamento.html">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição e Programação</label>
+                            <textarea id="eventoDesc" class="form-control" placeholder="Detalhes, regras, inscrições e informações gerais"></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn btn-primary" id="btnSalvarEvento"><i class="fas fa-calendar-plus"></i> Salvar Evento</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarEvento" style="display:none;" onclick="cancelarEdicaoEvento()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="listaEventosAdmin"></div>
+            </div>
+
+            <!-- TAB 7: MARCOS HISTÓRICOS -->
+            <div id="tab-momentos" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-landmark"></i> Marcos e Momentos Históricos</h2>
+                        <div class="tab-desc">Galeria histórica de fundação, conquistas e momentos eternizados da ASSGA</div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-camera-retro"></i> Cadastrar Novo Marco Histórico</div>
+                    <form id="formHistorico" onsubmit="salvarMarcoHistorico(event)">
+                        <input type="hidden" id="historicoEditIdx" value="-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Título do Momento / Marco</label>
+                                <input type="text" id="histTitulo" class="form-control" required placeholder="Ex: Criação da Equipe de Futsal da ASSGA">
+                            </div>
+                            <div class="form-group">
+                                <label>Ano ou Data</label>
+                                <input type="text" id="histData" class="form-control" placeholder="Ex: 23 de Julho de 2024">
+                            </div>
+                            <div class="form-group">
+                                <label>Foto do Registro (URL ou Caminho)</label>
+                                <input type="text" id="histImagem" class="form-control" placeholder="src/imagens/foto2.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label>Ou Enviar Foto</label>
+                                <input type="file" id="histFotoFile" class="form-control" accept="image/*" onchange="processarUploadImagem(event, 'histImagem')">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Relato Histórico</label>
+                            <textarea id="histTexto" class="form-control" placeholder="Descreva a importância e os fatos deste momento para a história da ASSGA"></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn btn-primary" id="btnSalvarHist"><i class="fas fa-plus"></i> Salvar Marco Histórico</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarHist" style="display:none;" onclick="cancelarEdicaoHist()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="listaMarcosHistoricosAdmin"></div>
+            </div>
+
+            <!-- TAB 8: DIRETORIA -->
+            <div id="tab-diretoria" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-users-gear"></i> Diretoria Executiva</h2>
+                        <div class="tab-desc">Membros da liderança da ASSGA, cargos, contatos e mandatos</div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-user-plus"></i> Adicionar Membro da Diretoria</div>
+                    <form id="formDiretoria" onsubmit="salvarDiretoria(event)">
+                        <input type="hidden" id="dirEditIdx" value="-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nome Completo</label>
+                                <input type="text" id="dirNome" class="form-control" required placeholder="Ex: Carlos Nascimento">
+                            </div>
+                            <div class="form-group">
+                                <label>Cargo Oficial</label>
+                                <input type="text" id="dirCargo" class="form-control" required placeholder="Ex: Presidente">
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail</label>
+                                <input type="email" id="dirEmail" class="form-control" placeholder="assgar2019@gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefone / WhatsApp</label>
+                                <input type="text" id="dirTelefone" class="form-control" placeholder="(84) 99698-1248">
+                            </div>
+                            <div class="form-group">
+                                <label>Foto do Diretor</label>
+                                <input type="text" id="dirFoto" class="form-control" placeholder="src/imagens/Assga_foto.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label>Ou Enviar Foto</label>
+                                <input type="file" id="dirFotoFile" class="form-control" accept="image/*" onchange="processarUploadImagem(event, 'dirFoto')">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Atribuição e Resumo da Gestão</label>
+                            <input type="text" id="dirDesc" class="form-control" placeholder="Representação legal, articulação de políticas públicas e defesa dos direitos dos surdos.">
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="submit" class="btn btn-primary" id="btnSalvarDir"><i class="fas fa-user-plus"></i> Salvar Membro</button>
+                            <button type="button" class="btn btn-secondary" id="btnCancelarDir" style="display:none;" onclick="cancelarEdicaoDir()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="listaDiretoriaAdmin"></div>
+            </div>
+
+            <!-- TAB 9: CONFIGURAÇÕES GERAIS -->
+            <div id="tab-config" class="tab-panel">
+                <div class="tab-header">
+                    <div>
+                        <h2><i class="fas fa-sliders"></i> Dados Oficiais e Configurações da ASSGA</h2>
+                        <div class="tab-desc">Configurações institucionais, chave PIX, CNPJ e backup de todo o banco de dados</div>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-building"></i> Dados Oficiais da Associação</div>
+                    <form id="formConfig" onsubmit="salvarConfigGerais(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nome da Associação</label>
+                                <input type="text" id="confNome" class="form-control" value="Associação de surdos de São Gonçalo do Amarante">
+                            </div>
+                            <div class="form-group">
+                                <label>Sigla</label>
+                                <input type="text" id="confSigla" class="form-control" value="ASSGA">
+                            </div>
+                            <div class="form-group">
+                                <label>CNPJ Oficial</label>
+                                <input type="text" id="confCnpj" class="form-control" value="57.242.499/0001-60">
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Fundação</label>
+                                <input type="text" id="confFundacao" class="form-control" value="23 de julho de 2024">
+                            </div>
+                            <div class="form-group">
+                                <label>Chave PIX Oficial</label>
+                                <input type="text" id="confPix" class="form-control" value="assgar2019@gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefone / WhatsApp Geral</label>
+                                <input type="text" id="confTelefone" class="form-control" value="(84) 99698-1248">
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail de Contato</label>
+                                <input type="email" id="confEmail" class="form-control" value="assgar2019@gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Endereço Completo</label>
+                                <input type="text" id="confEndereco" class="form-control" value="Rua da Floresta, 562 - São Gonçalo do Amarante-RN">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-floppy-disk"></i> Salvar Configurações</button>
+                    </form>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-palette"></i> Identidade visual</div>
+                    <p style="font-size:13px; color:#52606d; margin-bottom:15px;">Gerencie a logo e o favicon exibidos em todas as páginas do site.</p>
+                    <a href="logo.html" class="btn btn-primary"><i class="fas fa-images"></i> Gerenciar Logo e Favicon</a>
+                </div>
+
+                <div class="admin-card" style="background:#fefce8; border-color:#fef08a;">
+                    <div class="admin-card-title" style="color:#854d0e;"><i class="fas fa-database"></i> Backup & Recuperação Geral</div>
+                    <p style="font-size:13px; color:#713f12; margin-bottom:15px; line-height:1.5;">
+                        Você pode exportar todos os dados de sócios, fotos do momento, inscrições, notícias e eventos para um arquivo seguro em seu computador ou restaurar um backup anterior.
+                    </p>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="exportarBackup()"><i class="fas fa-file-arrow-down"></i> Baixar Arquivo de Backup (JSON)</button>
+                        <label class="btn btn-secondary" style="margin-bottom:0; cursor:pointer;">
+                            <i class="fas fa-file-arrow-up"></i> Restaurar Arquivo de Backup
+                            <input type="file" accept=".json" style="display:none;" onchange="importarBackup(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL DETALHES DE INSCRIÇÃO -->
+    <div class="modal-overlay" id="modalInscricao">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-ticket"></i> Detalhes da Inscrição</h3>
+                <button type="button" class="modal-close" onclick="fecharModalInscricao()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalInscricaoConteudo"></div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================================
+        // NAVEGAÇÃO ENTRE ABAS
+        // =============================================================
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+            
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+
+            const btn = document.querySelector(`.sidebar button[onclick*="${tabId}"]`);
+            if (btn) btn.classList.add('active');
+        }
+
+        // =============================================================
+        // DADOS PADRÃO E INICIALIZAÇÃO
+        // =============================================================
+        const SLIDES_PADRAO = [
+            { imagem: "src/imagens/foto2.jpg", texto: "Equipe Oficial de Futsal da ASSGA - Conquistas e Esporte" },
+            { imagem: "src/imagens/foto1.jpg", texto: "Confraternização e União da Comunidade ASSGA" },
+            { imagem: "src/imagens/foto3 (1).jpg", texto: "Atletas e Treinos da Associação Desportiva ASSGA" },
+            { imagem: "src/imagens/halloween-assga.jpeg", texto: "2º Festa de Halloween do ASSGA - 28 e 29 de Novembro" },
+            { imagem: "src/imagens/Assga_foto.jpg", texto: "ASSGA - Associação de Surdos de São Gonçalo do Amarante" }
+        ];
+
+        const HISTORIAS_PADRAO = [
+            {
+                titulo: "Fundação da ASSGA",
+                data: "23 de Julho de 2024",
+                texto: "Reuniões iniciais e formalização legal da Associação de Surdos de São Gonçalo do Amarante com foco no esporte inclusivo e na valorização da Libras.",
+                imagem: "src/imagens/Assga_foto.jpg"
+            },
+            {
+                titulo: "Confraternização e União Comunitária",
+                data: "2024",
+                texto: "Encontros de fim de ano, confraternizações e acolhimento dos associados e familiares em clima de festa e companheirismo.",
+                imagem: "src/imagens/foto1.jpg"
+            },
+            {
+                titulo: "Equipe Oficial de Futsal e Conquistas",
+                data: "2025",
+                texto: "Grandes vitórias em competições regionais, troféus e medalhas conquistados com muita garra pela equipe de futsal da ASSGA.",
+                imagem: "src/imagens/foto2.jpg"
+            },
+            {
+                titulo: "Treinos Semanais e Atividades Físicas",
+                data: "2026",
+                texto: "Treinos no ginásio poliesportivo de São Gonçalo do Amarante, promovendo saúde, integração social e novos talentos.",
+                imagem: "src/imagens/foto3 (1).jpg"
+            }
+        ];
+
+        const SOCIOS_PADRAO = [];
+
+        function corrigirCaminhosDasImagens() {
+            const chaves = [
+                'assga_slider',
+                'assga_socios',
+                'assga_noticias',
+                'assga_eventos',
+                'assga_historias',
+                'assga_diretoria',
+                'assga_conteudos',
+                'assga_config'
+            ];
+
+            chaves.forEach((chave) => {
+                const salvo = localStorage.getItem(chave);
+                if (!salvo) return;
+
+                try {
+                    const corrigido = salvo.replaceAll('src/imagens/foto3.jpg', 'src/imagens/foto3 (1).jpg');
+                    if (corrigido !== salvo) localStorage.setItem(chave, corrigido);
+                } catch (error) {
+                    console.warn(`Nao foi possivel corrigir imagens de ${chave}.`, error);
+                }
+            });
+        }
+
+        function carregarTodosOsCadastros() {
+            corrigirCaminhosDasImagens();
+            carregarSlider();
+            carregarSocios();
+            carregarInscricoes();
+            carregarNoticias();
+            carregarEventos();
+            carregarMarcosHistoricos();
+            carregarDiretoria();
+            carregarConfiguracoes();
+            atualizarContadoresGerais();
+        }
+
+        function atualizarContadoresGerais() {
+            const slider = JSON.parse(localStorage.getItem('assga_slider') || '[]');
+            const socios = JSON.parse(localStorage.getItem('assga_socios') || '[]');
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+            const noticias = JSON.parse(localStorage.getItem('assga_noticias') || '[]');
+            const eventos = JSON.parse(localStorage.getItem('assga_eventos') || '[]');
+            const momentos = JSON.parse(localStorage.getItem('assga_historias') || '[]');
+            const diretoria = JSON.parse(localStorage.getItem('assga_diretoria') || '[]');
+
+            document.getElementById('statSlider').textContent = slider.length;
+            document.getElementById('statSocios').textContent = socios.length;
+            document.getElementById('statVagas').textContent = inscricoes.length + '/100';
+            document.getElementById('statNoticias').textContent = noticias.length;
+            document.getElementById('statEventos').textContent = eventos.length;
+
+            document.getElementById('badgeSlider').textContent = slider.length;
+            document.getElementById('badgeSocios').textContent = socios.length;
+            document.getElementById('badgeInscricoes').textContent = inscricoes.length;
+            document.getElementById('badgeNoticias').textContent = noticias.length;
+            document.getElementById('badgeEventos').textContent = eventos.length;
+            document.getElementById('badgeMomentos').textContent = momentos.length;
+            document.getElementById('badgeDiretoria').textContent = diretoria.length;
+        }
+
+        // =============================================================
+        // 1. GESTÃO DE FOTOS DO MOMENTO (SLIDER)
+        // =============================================================
+        function carregarSlider() {
+            let slides = [];
+            try {
+                slides = JSON.parse(localStorage.getItem('assga_slider') || 'null');
+            } catch(e) {}
+
+            if (!slides || !Array.isArray(slides) || slides.length < 5) {
+                slides = [...SLIDES_PADRAO];
+                localStorage.setItem('assga_slider', JSON.stringify(slides));
+            }
+
+            document.getElementById('totalSliderCount').textContent = slides.length;
+            const container = document.getElementById('listaSliderCards');
+
+            if (slides.length === 0) {
+                container.innerHTML = '<div style="color:#64748b; padding:20px; text-align:center; grid-column:1/-1;">Nenhuma foto do momento cadastrada.</div>';
+                return;
+            }
+
+            container.innerHTML = slides.map((s, idx) => `
+                <div class="slider-item-card">
+                    <div class="slider-item-thumb">
+                        <span class="slider-item-pos">#${idx + 1}</span>
+                        <img src="${s.imagem}" alt="${escapeHtml(s.texto)}" onerror="this.src='src/imagens/foto1.jpg'">
+                    </div>
+                    <div class="slider-item-body">
+                        <div class="slider-item-title" title="${escapeHtml(s.texto)}">${escapeHtml(s.texto)}</div>
+                        <div class="slider-item-actions">
+                            ${idx > 0 ? `<button type="button" class="btn btn-secondary btn-sm" onclick="moverFotoSlider(${idx}, -1)" title="Subir ordem"><i class="fas fa-arrow-up"></i></button>` : ''}
+                            ${idx < slides.length - 1 ? `<button type="button" class="btn btn-secondary btn-sm" onclick="moverFotoSlider(${idx}, 1)" title="Descer ordem"><i class="fas fa-arrow-down"></i></button>` : ''}
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removerFotoSlider(${idx})" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function salvarFotoSlider(e) {
+            e.preventDefault();
+            const texto = document.getElementById('sliderTexto').value.trim();
+            let imagem = document.getElementById('sliderImagem').value.trim();
+            if (!imagem) imagem = 'src/imagens/foto1.jpg';
+
+            const slides = JSON.parse(localStorage.getItem('assga_slider') || '[]');
+            slides.push({ imagem, texto });
+            localStorage.setItem('assga_slider', JSON.stringify(slides));
+
+            document.getElementById('formSlider').reset();
+            carregarSlider();
+            atualizarContadoresGerais();
+            alert('Foto do momento cadastrada com sucesso! Já está visível na página inicial.');
+        }
+
+        function moverFotoSlider(idx, direcao) {
+            const slides = JSON.parse(localStorage.getItem('assga_slider') || '[]');
+            const novoIdx = idx + direcao;
+            if (novoIdx < 0 || novoIdx >= slides.length) return;
+            const item = slides.splice(idx, 1)[0];
+            slides.splice(novoIdx, 0, item);
+            localStorage.setItem('assga_slider', JSON.stringify(slides));
+            carregarSlider();
+        }
+
+        function removerFotoSlider(idx) {
+            if (confirm('Deseja excluir esta foto do momento?')) {
+                const slides = JSON.parse(localStorage.getItem('assga_slider') || '[]');
+                slides.splice(idx, 1);
+                localStorage.setItem('assga_slider', JSON.stringify(slides));
+                carregarSlider();
+                atualizarContadoresGerais();
+            }
+        }
+
+        function resetarSliderPadrao() {
+            if (confirm('Restaurar as 3 fotos do momento originais da ASSGA?')) {
+                localStorage.setItem('assga_slider', JSON.stringify(SLIDES_PADRAO));
+                carregarSlider();
+                atualizarContadoresGerais();
+            }
+        }
+
+        // =============================================================
+        // 2. GESTÃO DE SÓCIOS & CARTEIRINHAS
+        // =============================================================
+        function carregarSocios() {
+            let socios = [];
+            try {
+                socios = JSON.parse(localStorage.getItem('assga_socios') || 'null');
+            } catch(e) {}
+
+            if (!Array.isArray(socios)) {
+                socios = [];
+            }
+
+            const sociosSemExemplos = socios.filter(socio => ![
+                '000.000.000-01',
+                '111.222.333-44'
+            ].includes(socio.cpf));
+            if (sociosSemExemplos.length !== socios.length) {
+                socios = sociosSemExemplos;
+                localStorage.setItem('assga_socios', JSON.stringify(socios));
+            }
+
+            renderizarTabelaSocios(socios);
+        }
+
+        function renderizarTabelaSocios(lista) {
+            const tbody = document.getElementById('tabelaSocios');
+            document.getElementById('contadorSocios').textContent = `${lista.length} sócio(s) cadastrado(s)`;
+
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding:24px;">Nenhum sócio encontrado.</td></tr>';
+                return;
+            }
+
+            const mesesNomes = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+
+            tbody.innerHTML = lista.map((s, idx) => {
+                const mesesPagos = Array.isArray(s.mesesPagos) ? s.mesesPagos : [];
+                return `
+                    <tr>
+                        <td>
+                            <img src="${s.foto || 'src/imagens/avatar-padrao.jpg'}" alt="${escapeHtml(s.nome)}" 
+                                 style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #004aad;">
+                        </td>
+                        <td><strong>${escapeHtml(s.matricula || '-')}</strong></td>
+                        <td>
+                            <div style="font-weight:700; color:#003366;">${escapeHtml(s.nome)}</div>
+                            <div style="font-size:11.5px; color:#64748b;">${s.nascimento ? 'Nasc: ' + escapeHtml(s.nascimento) : ''}</div>
+                        </td>
+                        <td><code>${escapeHtml(s.cpf || '-')}</code></td>
+                        <td><span class="badge badge-info">${escapeHtml(s.categoria || 'Sócio Efetivo')}</span></td>
+                        <td>
+                            <div class="meses-grid" style="max-width:180px;">
+                                ${mesesNomes.map((m, mIdx) => `
+                                    <button type="button" class="mes-btn ${mesesPagos.includes(mIdx) ? 'pago' : ''}" 
+                                            onclick="toggleMesPago(${idx}, ${mIdx})" 
+                                            title="Clique para alternar mês ${mIdx + 1}">
+                                        ${m}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <a href="carteirinha-impressa.html?socio=${idx}" target="_blank" class="btn btn-primary btn-sm" title="Imprimir Carteirinha">
+                                    <i class="fas fa-id-card"></i>
+                                </a>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="editarSocio(${idx})" title="Editar Sócio">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removerSocio(${idx})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleMesPago(socioIdx, mesIdx) {
+            const socios = JSON.parse(localStorage.getItem('assga_socios') || '[]');
+            if (!socios[socioIdx]) return;
+            if (!Array.isArray(socios[socioIdx].mesesPagos)) socios[socioIdx].mesesPagos = [];
+
+            const pIdx = socios[socioIdx].mesesPagos.indexOf(mesIdx);
+            if (pIdx > -1) {
+                socios[socioIdx].mesesPagos.splice(pIdx, 1);
+            } else {
+                socios[socioIdx].mesesPagos.push(mesIdx);
+                socios[socioIdx].mesesPagos.sort((a, b) => a - b);
+            }
+            localStorage.setItem('assga_socios', JSON.stringify(socios));
+            carregarSocios();
+        }
+
+        function salvarSocio(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('socioEditIdx').value, 10);
+            const nome = document.getElementById('socioNome').value.trim();
+            const cpf = document.getElementById('socioCpf').value.trim();
+            const nascimento = document.getElementById('socioNascimento').value.trim();
+            const matricula = document.getElementById('socioMatricula').value.trim();
+            const telefone = document.getElementById('socioTelefone').value.trim();
+            const categoria = document.getElementById('socioCategoria').value;
+            const senha = document.getElementById('socioSenha').value.trim() || '123456';
+            const foto = document.getElementById('socioFotoUrl').value || 'src/imagens/avatar-padrao.jpg';
+
+            const socios = JSON.parse(localStorage.getItem('assga_socios') || '[]');
+
+            if (editIdx >= 0 && editIdx < socios.length) {
+                socios[editIdx] = {
+                    ...socios[editIdx],
+                    nome, cpf, nascimento, matricula, telefone, categoria, senha, foto
+                };
+            } else {
+                socios.push({
+                    nome, cpf, nascimento, matricula, telefone, categoria, senha, foto,
+                    mesesPagos: [0, 1] // Inicializa com Jan e Fev pagos
+                });
+            }
+
+            localStorage.setItem('assga_socios', JSON.stringify(socios));
+            cancelarEdicaoSocio();
+            carregarSocios();
+            atualizarContadoresGerais();
+        }
+
+        function editarSocio(idx) {
+            const socios = JSON.parse(localStorage.getItem('assga_socios') || '[]');
+            const s = socios[idx];
+            if (!s) return;
+
+            document.getElementById('socioEditIdx').value = idx;
+            document.getElementById('socioNome').value = s.nome || '';
+            document.getElementById('socioCpf').value = s.cpf || '';
+            document.getElementById('socioNascimento').value = s.nascimento || '';
+            document.getElementById('socioMatricula').value = s.matricula || '';
+            document.getElementById('socioTelefone').value = s.telefone || '';
+            document.getElementById('socioCategoria').value = s.categoria || 'Sócio Efetivo';
+            document.getElementById('socioSenha').value = s.senha || '';
+            document.getElementById('socioFotoUrl').value = s.foto || 'src/imagens/avatar-padrao.jpg';
+
+            document.getElementById('btnSalvarSocio').innerHTML = '<i class="fas fa-save"></i> Atualizar Sócio';
+            document.getElementById('btnCancelarSocio').style.display = 'inline-flex';
+            window.scrollTo({ top: document.getElementById('formSocio').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoSocio() {
+            document.getElementById('formSocio').reset();
+            document.getElementById('socioEditIdx').value = '-1';
+            document.getElementById('socioFotoUrl').value = 'src/imagens/avatar-padrao.jpg';
+            document.getElementById('btnSalvarSocio').innerHTML = '<i class="fas fa-plus"></i> Salvar Sócio';
+            document.getElementById('btnCancelarSocio').style.display = 'none';
+        }
+
+        function removerSocio(idx) {
+            if (confirm('Deseja excluir este associado do sistema?')) {
+                const socios = JSON.parse(localStorage.getItem('assga_socios') || '[]');
+                socios.splice(idx, 1);
+                localStorage.setItem('assga_socios', JSON.stringify(socios));
+                carregarSocios();
+                atualizarContadoresGerais();
+            }
+        }
+
+        function filtrarSocios() {
+            const termo = document.getElementById('buscaSocio').value.toLowerCase().trim();
+            const socios = JSON.parse(localStorage.getItem('assga_socios') || '[]');
+            const filtrados = socios.filter(s => 
+                (s.nome && s.nome.toLowerCase().includes(termo)) ||
+                (s.cpf && s.cpf.includes(termo)) ||
+                (s.matricula && s.matricula.toLowerCase().includes(termo))
+            );
+            renderizarTabelaSocios(filtrados);
+        }
+
+        // =============================================================
+        // 3. GESTÃO DE INSCRIÇÕES & VAGAS (HALLOWEEN)
+        // =============================================================
+        function carregarInscricoes() {
+            let inscricoes = [];
+            try {
+                inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || 'null');
+            } catch(e) {}
+
+            if (!Array.isArray(inscricoes)) {
+                inscricoes = [];
+            }
+
+            const inscricoesSemExemplos = inscricoes.filter(item => !['HW-1024', 'HW-1025'].includes(item.codigo));
+            if (inscricoesSemExemplos.length !== inscricoes.length) {
+                inscricoes = inscricoesSemExemplos;
+                localStorage.setItem('assga_inscricoes', JSON.stringify(inscricoes));
+            }
+
+            renderizarTabelaInscricoes(inscricoes);
+        }
+
+        function renderizarTabelaInscricoes(lista) {
+            const tbody = document.getElementById('tabelaInscricoes');
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#64748b; padding:24px;">Nenhuma inscrição encontrada.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = lista.map((item, idx) => `
+                <tr>
+                    <td><strong>#${item.vaga || (idx + 1)}</strong></td>
+                    <td><code>${escapeHtml(item.codigo || '-')}</code></td>
+                    <td><strong>${escapeHtml(item.nome || '-')}</strong></td>
+                    <td>${escapeHtml(mascararCPF(item.cpf))}</td>
+                    <td>${escapeHtml(mascararWhatsApp(item.telefone || item.whatsapp))}</td>
+                    <td>${escapeHtml(item.pagamento || 'PIX')} (R$ ${escapeHtml(String(item.valor || '50'))})</td>
+                    <td>
+                        <span class="badge ${item.statusPagamento === 'PAGO' ? 'badge-success' : 'badge-warning'}">
+                            ${item.statusPagamento || 'PENDENTE'}
+                        </span>
+                        <span class="badge ${item.statusPagamento === 'PAGO' ? 'badge-success' : 'badge-warning'}" style="margin-left:4px;">
+                            ${item.statusPagamento === 'PAGO' ? 'ATIVA' : 'NÃO ATIVA'}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px;">
+                            ${item.statusPagamento !== 'PAGO' ? `
+                                <button type="button" class="btn btn-sm btn-success" onclick="toggleStatusInscricao(${idx})" title="Confirmar pagamento e ativar inscrição">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            ` : ''}
+                            <button type="button" class="btn btn-primary btn-sm" onclick="verDetalhesInscricao(${idx})" title="Ver Detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removerInscricao(${idx})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function salvarInscricaoManual(e) {
+            e.preventDefault();
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+            if (inscricoes.length >= 100) {
+                alert('Limite máximo de 100 vagas atingido!');
+                return;
+            }
+
+            const nome = document.getElementById('inscNome').value.trim();
+            const cpf = document.getElementById('inscCpf').value.trim();
+            const telefone = document.getElementById('inscWhats').value.trim();
+            const pagamento = document.getElementById('inscPagamento').value;
+            const valor = document.getElementById('inscValor').value;
+            const statusPagamento = 'PENDENTE';
+            const vaga = inscricoes.length + 1;
+            const codigo = "HW-" + Math.floor(1000 + Math.random() * 9000);
+
+            inscricoes.push({
+                vaga, codigo, nome, cpf, telefone, pagamento, valor, statusPagamento,
+                data: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})
+            });
+
+            localStorage.setItem('assga_inscricoes', JSON.stringify(inscricoes));
+            document.getElementById('formInscricaoManual').reset();
+            carregarInscricoes();
+            atualizarContadoresGerais();
+            alert(`Inscrição #${vaga} (${codigo}) registrada com sucesso!`);
+        }
+
+        function toggleStatusInscricao(idx) {
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+            if (!inscricoes[idx]) return;
+            inscricoes[idx].statusPagamento = 'PAGO';
+            localStorage.setItem('assga_inscricoes', JSON.stringify(inscricoes));
+            carregarInscricoes();
+        }
+
+        function removerInscricao(idx) {
+            if (confirm('Deseja excluir esta inscrição?')) {
+                const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+                inscricoes.splice(idx, 1);
+                // Reindexar vagas
+                inscricoes.forEach((it, i) => it.vaga = i + 1);
+                localStorage.setItem('assga_inscricoes', JSON.stringify(inscricoes));
+                carregarInscricoes();
+                atualizarContadoresGerais();
+            }
+        }
+
+        function limparInscricoes() {
+            if (confirm('ATENÇÃO: Deseja apagar todas as inscrições do evento? Esta ação não pode ser desfeita.')) {
+                localStorage.setItem('assga_inscricoes', '[]');
+                carregarInscricoes();
+                atualizarContadoresGerais();
+            }
+        }
+
+        function verDetalhesInscricao(idx) {
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+            const item = inscricoes[idx];
+            if (!item) return;
+
+            const modalBody = document.getElementById('modalInscricaoConteudo');
+            modalBody.innerHTML = `
+                <div style="text-align:center; margin-bottom:16px;">
+                    <div style="font-size:28px; font-weight:900; color:#003366;">Vaga #${item.vaga}</div>
+                    <div style="font-size:18px; color:#ffd700; background:#003366; display:inline-block; padding:4px 14px; border-radius:8px; font-weight:800; margin-top:4px;">
+                        ${item.codigo}
+                    </div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px; font-size:14px; line-height:1.8;">
+                    <div><strong>Nome:</strong> ${escapeHtml(item.nome)}</div>
+                    <div><strong>CPF:</strong> <span id="inscricaoCpfDetalhe">${escapeHtml(mascararCPF(item.cpf))}</span></div>
+                    <div><strong>WhatsApp:</strong> <span id="inscricaoWhatsAppDetalhe">${escapeHtml(mascararWhatsApp(item.telefone || item.whatsapp))}</span></div>
+                    <div><strong>Forma de Pagamento:</strong> ${escapeHtml(item.pagamento)} (R$ ${item.valor})</div>
+                    <div><strong>Status:</strong> <span class="badge ${item.statusPagamento === 'PAGO' ? 'badge-success' : 'badge-warning'}">${item.statusPagamento}</span></div>
+                    <div><strong>Data do Registro:</strong> ${item.data || '-'}</div>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button type="button" class="btn btn-primary" onclick="mostrarDadosInscricao(${idx})" id="btnMostrarDadosInscricao">
+                        <i class="fas fa-eye"></i> Mostrar dados completos
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalInscricao()">Fechar</button>
+                    <a href="https://wa.me/55${(item.telefone || '').replace(/\D/g, '')}?text=${encodeURIComponent('Olá ' + item.nome + ', confirmamos sua vaga #' + item.vaga + ' (' + item.codigo + ') no Halloween ASSGA!')}" 
+                       target="_blank" class="btn btn-success">
+                        <i class="fab fa-whatsapp"></i> Chamar no WhatsApp
+                    </a>
+                </div>
+            `;
+            document.getElementById('modalInscricao').classList.add('active');
+        }
+
+        function mostrarDadosInscricao(idx) {
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+            const item = inscricoes[idx];
+            if (!item) return;
+
+            document.getElementById('inscricaoCpfDetalhe').textContent = item.cpf || '-';
+            document.getElementById('inscricaoWhatsAppDetalhe').textContent = item.telefone || item.whatsapp || '-';
+            const botao = document.getElementById('btnMostrarDadosInscricao');
+            if (botao) botao.remove();
+        }
+
+        function fecharModalInscricao() {
+            document.getElementById('modalInscricao').classList.remove('active');
+        }
+
+        function filtrarInscricoes() {
+            const termo = document.getElementById('buscaInscricao').value.toLowerCase().trim();
+            const status = document.getElementById('filtroStatusInscricao').value;
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+
+            const filtradas = inscricoes.filter(item => {
+                const matchTexto = (item.nome && item.nome.toLowerCase().includes(termo)) ||
+                                   (item.cpf && item.cpf.includes(termo)) ||
+                                   (item.codigo && item.codigo.toLowerCase().includes(termo));
+                const matchStatus = (status === 'TODOS' || item.statusPagamento === status);
+                return matchTexto && matchStatus;
+            });
+            renderizarTabelaInscricoes(filtradas);
+        }
+
+        function exportarInscricoesCSV() {
+            const inscricoes = JSON.parse(localStorage.getItem('assga_inscricoes') || '[]');
+            if (inscricoes.length === 0) {
+                alert('Não há inscrições para exportar.');
+                return;
+            }
+            let csv = 'VAGA;CODIGO;NOME;CPF;TELEFONE;PAGAMENTO;VALOR;STATUS;DATA\n';
+            inscricoes.forEach(it => {
+                csv += `"${it.vaga}";"${it.codigo}";"${it.nome}";"${it.cpf}";"${it.telefone || it.whatsapp}";"${it.pagamento}";"${it.valor}";"${it.statusPagamento}";"${it.data || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `inscricoes_halloween_assga_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        // =============================================================
+        // 4. GESTÃO DE NOTÍCIAS
+        // =============================================================
+        function carregarNoticias() {
+            let noticias = [];
+            try {
+                noticias = JSON.parse(localStorage.getItem('assga_noticias') || 'null');
+            } catch(e) {}
+
+            if (!noticias || !Array.isArray(noticias) || noticias.length === 0) {
+                noticias = [
+                    {
+                        titulo: "Nova Gestão da ASSGA assume com foco na inclusão e no esporte",
+                        categoria: "Institucional",
+                        data: "20/08/2026",
+                        imagem: "src/imagens/foto1.jpg",
+                        texto: "A diretoria executiva da ASSGA tomou posse com novos projetos voltados para a formação esportiva e apoio à comunidade surda em São Gonçalo do Amarante."
+                    },
+                    {
+                        titulo: "Inscrições abertas para o 2º Halloween ASSGA",
+                        categoria: "Eventos",
+                        data: "01/09/2026",
+                        imagem: "src/imagens/halloween-assga.jpeg",
+                        texto: "O evento mais aguardado do ano está com vagas limitadas! Associados contam com 50% de desconto no cupom exclusivo."
+                    }
+                ];
+                localStorage.setItem('assga_noticias', JSON.stringify(noticias));
+            }
+
+            const container = document.getElementById('listaNoticiasAdmin');
+            container.innerHTML = noticias.map((n, idx) => `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                    <img src="${n.imagem || 'src/imagens/foto1.jpg'}" alt="${escapeHtml(n.titulo)}" 
+                         style="width:90px; height:65px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;">
+                    <div style="flex:1; min-width:240px;">
+                        <span class="badge badge-info">${escapeHtml(n.categoria || 'Geral')}</span>
+                        <span style="font-size:11.5px; color:#64748b; margin-left:8px;">${escapeHtml(n.data || '')}</span>
+                        <div style="font-weight:700; color:#003366; font-size:15px; margin-top:4px;">${escapeHtml(n.titulo)}</div>
+                        <div style="font-size:13px; color:#475569; margin-top:2px;">${escapeHtml((n.texto || '').substring(0, 110))}...</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarNoticia(${idx})"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removerNoticia(${idx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function salvarNoticia(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('noticiaEditIdx').value, 10);
+            const titulo = document.getElementById('noticiaTitulo').value.trim();
+            const categoria = document.getElementById('noticiaCategoria').value;
+            let imagem = document.getElementById('noticiaImagem').value.trim() || 'src/imagens/foto1.jpg';
+            const texto = document.getElementById('noticiaTexto').value.trim();
+            const data = new Date().toLocaleDateString('pt-BR');
+
+            const noticias = JSON.parse(localStorage.getItem('assga_noticias') || '[]');
+
+            if (editIdx >= 0 && editIdx < noticias.length) {
+                noticias[editIdx] = { ...noticias[editIdx], titulo, categoria, imagem, texto };
+            } else {
+                noticias.unshift({ titulo, categoria, imagem, texto, data });
+            }
+
+            localStorage.setItem('assga_noticias', JSON.stringify(noticias));
+            cancelarEdicaoNoticia();
+            carregarNoticias();
+            atualizarContadoresGerais();
+        }
+
+        function editarNoticia(idx) {
+            const noticias = JSON.parse(localStorage.getItem('assga_noticias') || '[]');
+            const n = noticias[idx];
+            if (!n) return;
+
+            document.getElementById('noticiaEditIdx').value = idx;
+            document.getElementById('noticiaTitulo').value = n.titulo || '';
+            document.getElementById('noticiaCategoria').value = n.categoria || 'Esporte';
+            document.getElementById('noticiaImagem').value = n.imagem || '';
+            document.getElementById('noticiaTexto').value = n.texto || '';
+
+            document.getElementById('btnSalvarNoticia').innerHTML = '<i class="fas fa-save"></i> Atualizar Notícia';
+            document.getElementById('btnCancelarNoticia').style.display = 'inline-flex';
+            window.scrollTo({ top: document.getElementById('formNoticia').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoNoticia() {
+            document.getElementById('formNoticia').reset();
+            document.getElementById('noticiaEditIdx').value = '-1';
+            document.getElementById('btnSalvarNoticia').innerHTML = '<i class="fas fa-paper-plane"></i> Publicar Notícia';
+            document.getElementById('btnCancelarNoticia').style.display = 'none';
+        }
+
+        function removerNoticia(idx) {
+            if (confirm('Deseja excluir esta notícia?')) {
+                const noticias = JSON.parse(localStorage.getItem('assga_noticias') || '[]');
+                noticias.splice(idx, 1);
+                localStorage.setItem('assga_noticias', JSON.stringify(noticias));
+                carregarNoticias();
+                atualizarContadoresGerais();
+            }
+        }
+
+        // =============================================================
+        // 5. GESTÃO DE EVENTOS
+        // =============================================================
+        function carregarEventos() {
+            let eventos = [];
+            try {
+                eventos = JSON.parse(localStorage.getItem('assga_eventos') || 'null');
+            } catch(e) {}
+
+            if (!eventos || !Array.isArray(eventos) || eventos.length === 0) {
+                eventos = [
+                    {
+                        titulo: "2º Halloween ASSGA - Noite dos Monstros",
+                        data: "31 de Outubro de 2026, às 19h",
+                        local: "Sede ASSGA - São Gonçalo do Amarante",
+                        preco: "50,00",
+                        status: "Aberto",
+                        imagem: "src/imagens/halloween-assga.jpeg",
+                        descricao: "Festa temática com concurso de fantasias, música e integração total da comunidade."
+                    }
+                ];
+                localStorage.setItem('assga_eventos', JSON.stringify(eventos));
+            }
+
+            const container = document.getElementById('listaEventosAdmin');
+            container.innerHTML = eventos.map((ev, idx) => `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <span class="badge ${ev.status === 'Aberto' ? 'badge-success' : 'badge-warning'}">${escapeHtml(ev.status || 'Aberto')}</span>
+                        <div style="font-weight:700; color:#003366; font-size:16px; margin-top:4px;">${escapeHtml(ev.titulo)}</div>
+                        <div style="font-size:13px; color:#64748b; margin-top:2px;">
+                            <i class="fas fa-calendar"></i> ${escapeHtml(ev.data || '-')} • 
+                            <i class="fas fa-location-dot"></i> ${escapeHtml(ev.local || '-')} • 
+                            <strong>R$ ${escapeHtml(ev.preco || '0,00')}</strong>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarEvento(${idx})"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removerEvento(${idx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function salvarEvento(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('eventoEditIdx').value, 10);
+            const titulo = document.getElementById('eventoTitulo').value.trim();
+            const data = document.getElementById('eventoData').value.trim();
+            const local = document.getElementById('eventoLocal').value.trim();
+            const preco = document.getElementById('eventoPreco').value.trim();
+            const status = document.getElementById('eventoStatus').value;
+            let imagem = document.getElementById('eventoImagem').value.trim() || 'src/imagens/halloween-assga.jpeg';
+            const linkInscricao = document.getElementById('eventoLink').value.trim() || 'pagamento.html';
+            const descricao = document.getElementById('eventoDesc').value.trim();
+
+            const eventos = JSON.parse(localStorage.getItem('assga_eventos') || '[]');
+
+            if (editIdx >= 0 && editIdx < eventos.length) {
+                eventos[editIdx] = { ...eventos[editIdx], titulo, data, local, preco, status, imagem, linkInscricao, descricao };
+            } else {
+                eventos.push({ titulo, data, local, preco, status, imagem, linkInscricao, descricao });
+            }
+
+            localStorage.setItem('assga_eventos', JSON.stringify(eventos));
+            cancelarEdicaoEvento();
+            carregarEventos();
+            atualizarContadoresGerais();
+        }
+
+        function editarEvento(idx) {
+            const eventos = JSON.parse(localStorage.getItem('assga_eventos') || '[]');
+            const ev = eventos[idx];
+            if (!ev) return;
+
+            document.getElementById('eventoEditIdx').value = idx;
+            document.getElementById('eventoTitulo').value = ev.titulo || '';
+            document.getElementById('eventoData').value = ev.data || '';
+            document.getElementById('eventoLocal').value = ev.local || '';
+            document.getElementById('eventoPreco').value = ev.preco || '';
+            document.getElementById('eventoStatus').value = ev.status || 'Aberto';
+            document.getElementById('eventoImagem').value = ev.imagem || '';
+            document.getElementById('eventoLink').value = ev.linkInscricao || '';
+            document.getElementById('eventoDesc').value = ev.descricao || '';
+
+            document.getElementById('btnSalvarEvento').innerHTML = '<i class="fas fa-save"></i> Atualizar Evento';
+            document.getElementById('btnCancelarEvento').style.display = 'inline-flex';
+            window.scrollTo({ top: document.getElementById('formEvento').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoEvento() {
+            document.getElementById('formEvento').reset();
+            document.getElementById('eventoEditIdx').value = '-1';
+            document.getElementById('btnSalvarEvento').innerHTML = '<i class="fas fa-calendar-plus"></i> Salvar Evento';
+            document.getElementById('btnCancelarEvento').style.display = 'none';
+        }
+
+        function removerEvento(idx) {
+            if (confirm('Deseja excluir este evento?')) {
+                const eventos = JSON.parse(localStorage.getItem('assga_eventos') || '[]');
+                eventos.splice(idx, 1);
+                localStorage.setItem('assga_eventos', JSON.stringify(eventos));
+                carregarEventos();
+                atualizarContadoresGerais();
+            }
+        }
+
+        // =============================================================
+        // 6. GESTÃO DE MARCOS HISTÓRICOS
+        // =============================================================
+        function carregarMarcosHistoricos() {
+            let historias = [];
+            try {
+                historias = JSON.parse(localStorage.getItem('assga_historias') || 'null');
+            } catch(e) {}
+
+            if (!historias || !Array.isArray(historias) || historias.length === 0) {
+                historias = [...HISTORIAS_PADRAO];
+                localStorage.setItem('assga_historias', JSON.stringify(historias));
+            }
+
+            const container = document.getElementById('listaMarcosHistoricosAdmin');
+            container.innerHTML = historias.map((h, idx) => `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                    <img src="${h.imagem || 'src/imagens/foto1.jpg'}" alt="${escapeHtml(h.titulo)}" 
+                         style="width:90px; height:65px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;">
+                    <div style="flex:1; min-width:240px;">
+                        <span class="badge badge-warning">${escapeHtml(h.data || 'Ano')}</span>
+                        <div style="font-weight:700; color:#003366; font-size:15px; margin-top:4px;">${escapeHtml(h.titulo)}</div>
+                        <div style="font-size:13px; color:#475569; margin-top:2px;">${escapeHtml((h.texto || '').substring(0, 110))}...</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarMarcoHistorico(${idx})"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removerMarcoHistorico(${idx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function salvarMarcoHistorico(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('historicoEditIdx').value, 10);
+            const titulo = document.getElementById('histTitulo').value.trim();
+            const data = document.getElementById('histData').value.trim();
+            let imagem = document.getElementById('histImagem').value.trim() || 'src/imagens/foto2.jpg';
+            const texto = document.getElementById('histTexto').value.trim();
+
+            const historias = JSON.parse(localStorage.getItem('assga_historias') || '[]');
+
+            if (editIdx >= 0 && editIdx < historias.length) {
+                historias[editIdx] = { ...historias[editIdx], titulo, data, imagem, texto };
+            } else {
+                historias.push({ titulo, data, imagem, texto });
+            }
+
+            localStorage.setItem('assga_historias', JSON.stringify(historias));
+            
+            // Sincroniza também com assga_conteudos para historia.html
+            try {
+                const conteudos = JSON.parse(localStorage.getItem('assga_conteudos') || '{}');
+                if (!conteudos.historia) conteudos.historia = {};
+                conteudos.historia.itens = historias;
+                localStorage.setItem('assga_conteudos', JSON.stringify(conteudos));
+            } catch(e) {}
+
+            cancelarEdicaoHist();
+            carregarMarcosHistoricos();
+            atualizarContadoresGerais();
+        }
+
+        function editarMarcoHistorico(idx) {
+            const historias = JSON.parse(localStorage.getItem('assga_historias') || '[]');
+            const h = historias[idx];
+            if (!h) return;
+
+            document.getElementById('historicoEditIdx').value = idx;
+            document.getElementById('histTitulo').value = h.titulo || '';
+            document.getElementById('histData').value = h.data || '';
+            document.getElementById('histImagem').value = h.imagem || '';
+            document.getElementById('histTexto').value = h.texto || '';
+
+            document.getElementById('btnSalvarHist').innerHTML = '<i class="fas fa-save"></i> Atualizar Marco';
+            document.getElementById('btnCancelarHist').style.display = 'inline-flex';
+            window.scrollTo({ top: document.getElementById('formHistorico').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoHist() {
+            document.getElementById('formHistorico').reset();
+            document.getElementById('historicoEditIdx').value = '-1';
+            document.getElementById('btnSalvarHist').innerHTML = '<i class="fas fa-plus"></i> Salvar Marco Histórico';
+            document.getElementById('btnCancelarHist').style.display = 'none';
+        }
+
+        function removerMarcoHistorico(idx) {
+            if (confirm('Deseja excluir este marco histórico?')) {
+                const historias = JSON.parse(localStorage.getItem('assga_historias') || '[]');
+                historias.splice(idx, 1);
+                localStorage.setItem('assga_historias', JSON.stringify(historias));
+                carregarMarcosHistoricos();
+                atualizarContadoresGerais();
+            }
+        }
+
+        // =============================================================
+        // 7. GESTÃO DA DIRETORIA
+        // =============================================================
+        function carregarDiretoria() {
+            let diretoria = [];
+            try {
+                diretoria = JSON.parse(localStorage.getItem('assga_diretoria') || 'null');
+            } catch(e) {}
+
+            if (!diretoria || !Array.isArray(diretoria) || diretoria.length === 0) {
+                diretoria = [
+                    {
+                        nome: "Diretoria Executiva",
+                        cargo: "Presidência",
+                        email: "assgar2019@gmail.com",
+                        telefone: "(84) 99698-1248",
+                        foto: "src/imagens/Assga_foto.jpg",
+                        descricao: "Gestão e representação oficial da Associação dos Surdos de São Gonçalo do Amarante."
+                    }
+                ];
+                localStorage.setItem('assga_diretoria', JSON.stringify(diretoria));
+            }
+
+            const container = document.getElementById('listaDiretoriaAdmin');
+            container.innerHTML = diretoria.map((d, idx) => `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <img src="${d.foto || 'src/imagens/avatar-padrao.jpg'}" alt="${escapeHtml(d.nome)}" 
+                             style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid #004aad;">
+                        <div>
+                            <div style="font-weight:700; color:#003366; font-size:15px;">${escapeHtml(d.nome)} - <span style="color:#004aad;">${escapeHtml(d.cargo)}</span></div>
+                            <div style="font-size:12.5px; color:#64748b;">${escapeHtml(d.email || '')} • ${escapeHtml(d.telefone || '')}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="editarDiretor(${idx})"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removerDiretor(${idx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function salvarDiretoria(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('dirEditIdx').value, 10);
+            const nome = document.getElementById('dirNome').value.trim();
+            const cargo = document.getElementById('dirCargo').value.trim();
+            const email = document.getElementById('dirEmail').value.trim();
+            const telefone = document.getElementById('dirTelefone').value.trim();
+            let foto = document.getElementById('dirFoto').value.trim() || 'src/imagens/Assga_foto.jpg';
+            const descricao = document.getElementById('dirDesc').value.trim();
+
+            const diretoria = JSON.parse(localStorage.getItem('assga_diretoria') || '[]');
+
+            if (editIdx >= 0 && editIdx < diretoria.length) {
+                diretoria[editIdx] = { ...diretoria[editIdx], nome, cargo, email, telefone, foto, descricao };
+            } else {
+                diretoria.push({ nome, cargo, email, telefone, foto, descricao });
+            }
+
+            localStorage.setItem('assga_diretoria', JSON.stringify(diretoria));
+            cancelarEdicaoDir();
+            carregarDiretoria();
+            atualizarContadoresGerais();
+        }
+
+        function editarDiretor(idx) {
+            const diretoria = JSON.parse(localStorage.getItem('assga_diretoria') || '[]');
+            const d = diretoria[idx];
+            if (!d) return;
+
+            document.getElementById('dirEditIdx').value = idx;
+            document.getElementById('dirNome').value = d.nome || '';
+            document.getElementById('dirCargo').value = d.cargo || '';
+            document.getElementById('dirEmail').value = d.email || '';
+            document.getElementById('dirTelefone').value = d.telefone || '';
+            document.getElementById('dirFoto').value = d.foto || '';
+            document.getElementById('dirDesc').value = d.descricao || '';
+
+            document.getElementById('btnSalvarDir').innerHTML = '<i class="fas fa-save"></i> Atualizar Membro';
+            document.getElementById('btnCancelarDir').style.display = 'inline-flex';
+            window.scrollTo({ top: document.getElementById('formDiretoria').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoDir() {
+            document.getElementById('formDiretoria').reset();
+            document.getElementById('dirEditIdx').value = '-1';
+            document.getElementById('btnSalvarDir').innerHTML = '<i class="fas fa-user-plus"></i> Salvar Membro';
+            document.getElementById('btnCancelarDir').style.display = 'none';
+        }
+
+        function removerDiretor(idx) {
+            if (confirm('Deseja excluir este membro da diretoria?')) {
+                const diretoria = JSON.parse(localStorage.getItem('assga_diretoria') || '[]');
+                diretoria.splice(idx, 1);
+                localStorage.setItem('assga_diretoria', JSON.stringify(diretoria));
+                carregarDiretoria();
+                atualizarContadoresGerais();
+            }
+        }
+
+        // =============================================================
+        // 8. CONFIGURAÇÕES INSTITUCIONAIS
+        // =============================================================
+        function carregarConfiguracoes() {
+            try {
+                const conf = JSON.parse(localStorage.getItem('assga_config') || '{}');
+                if (conf.nome) document.getElementById('confNome').value = conf.nome;
+                if (conf.sigla) document.getElementById('confSigla').value = conf.sigla;
+                if (conf.cnpj) document.getElementById('confCnpj').value = conf.cnpj;
+                if (conf.fundacao) document.getElementById('confFundacao').value = conf.fundacao;
+                if (conf.pix) document.getElementById('confPix').value = conf.pix;
+                if (conf.telefone) document.getElementById('confTelefone').value = conf.telefone;
+                if (conf.email) document.getElementById('confEmail').value = conf.email;
+                if (conf.endereco) document.getElementById('confEndereco').value = conf.endereco;
+            } catch(e) {}
+        }
+
+        function salvarConfigGerais(e) {
+            e.preventDefault();
+            const config = {
+                nome: document.getElementById('confNome').value.trim(),
+                sigla: document.getElementById('confSigla').value.trim(),
+                cnpj: document.getElementById('confCnpj').value.trim(),
+                fundacao: document.getElementById('confFundacao').value.trim(),
+                pix: document.getElementById('confPix').value.trim(),
+                telefone: document.getElementById('confTelefone').value.trim(),
+                email: document.getElementById('confEmail').value.trim(),
+                endereco: document.getElementById('confEndereco').value.trim()
+            };
+            localStorage.setItem('assga_config', JSON.stringify(config));
+            alert('Configurações salvas com sucesso!');
+        }
+
+        // =============================================================
+        // BACKUP E RESTAURAÇÃO
+        // =============================================================
+        function exportarBackup() {
+            const backup = {
+                assga_slider: JSON.parse(localStorage.getItem('assga_slider') || '[]'),
+                assga_socios: JSON.parse(localStorage.getItem('assga_socios') || '[]'),
+                assga_inscricoes: JSON.parse(localStorage.getItem('assga_inscricoes') || '[]'),
+                assga_noticias: JSON.parse(localStorage.getItem('assga_noticias') || '[]'),
+                assga_eventos: JSON.parse(localStorage.getItem('assga_eventos') || '[]'),
+                assga_historias: JSON.parse(localStorage.getItem('assga_historias') || '[]'),
+                assga_diretoria: JSON.parse(localStorage.getItem('assga_diretoria') || '[]'),
+                assga_config: JSON.parse(localStorage.getItem('assga_config') || '{}'),
+                timestamp: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `backup_assga_completo_${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+        }
+
+        function importarBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = JSON.parse(evt.target.result);
+                    if (data.assga_slider) localStorage.setItem('assga_slider', JSON.stringify(data.assga_slider));
+                    if (data.assga_socios) localStorage.setItem('assga_socios', JSON.stringify(data.assga_socios));
+                    if (data.assga_inscricoes) localStorage.setItem('assga_inscricoes', JSON.stringify(data.assga_inscricoes));
+                    if (data.assga_noticias) localStorage.setItem('assga_noticias', JSON.stringify(data.assga_noticias));
+                    if (data.assga_eventos) localStorage.setItem('assga_eventos', JSON.stringify(data.assga_eventos));
+                    if (data.assga_historias) localStorage.setItem('assga_historias', JSON.stringify(data.assga_historias));
+                    if (data.assga_diretoria) localStorage.setItem('assga_diretoria', JSON.stringify(data.assga_diretoria));
+                    if (data.assga_config) localStorage.setItem('assga_config', JSON.stringify(data.assga_config));
+                    alert('Backup restaurado com sucesso!');
+                    carregarTodosOsCadastros();
+                } catch(err) {
+                    alert('Erro ao importar backup: arquivo JSON inválido.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function restaurarPadraoAssga() {
+            if (confirm('Deseja recarregar todos os dados demonstrativos padrão da ASSGA?')) {
+                localStorage.setItem('assga_slider', JSON.stringify(SLIDES_PADRAO));
+                localStorage.setItem('assga_socios', JSON.stringify(SOCIOS_PADRAO));
+                localStorage.setItem('assga_historias', JSON.stringify(HISTORIAS_PADRAO));
+                carregarTodosOsCadastros();
+                alert('Dados demonstrativos carregados com sucesso!');
+            }
+        }
+
+        // =============================================================
+        // UTILITÁRIOS: UPLOAD DE IMAGEM & MÁSCARAS
+        // =============================================================
+        function processarUploadImagem(event, targetInputId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Limite de 2MB para preservar localStorage
+            if (file.size > 2 * 1024 * 1024) {
+                alert('A imagem é muito pesada (máx 2MB). Escolha uma imagem menor.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const target = document.getElementById(targetInputId);
+                if (target) target.value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function mascaraCPF(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.substring(0, 11);
+            if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            input.value = v;
+        }
+
+        function mascararCPF(valor) {
+            const cpf = String(valor || '').replace(/\D/g, '');
+            if (cpf.length !== 11) return valor || '-';
+            return `***.***.***-${cpf.slice(-2)}`;
+        }
+
+        function mascararWhatsApp(valor) {
+            const telefone = String(valor || '').replace(/\D/g, '');
+            if (telefone.length < 8) return valor || '-';
+            return `(${telefone.slice(0, 2)}) *****-${telefone.slice(-4)}`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function autenticarAdmin(e) {
+            e.preventDefault();
+            const senhaDigitada = document.getElementById('adminPassword').value;
+            const config = JSON.parse(localStorage.getItem('assga_config') || '{}');
+            const senhaAdmin = config.senhaAdmin || 'ASSGA2026';
+            if (senhaDigitada === senhaAdmin) {
+                sessionStorage.setItem('assga_admin_autenticado', 'true');
+                document.body.className = 'admin-unlocked';
+                carregarTodosOsCadastros();
+                return;
+            }
+            document.getElementById('adminAuthError').style.display = 'block';
+        }
+
+        function sairAdmin() {
+            sessionStorage.removeItem('assga_admin_autenticado');
+            window.location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('adminAuthForm').addEventListener('submit', autenticarAdmin);
+            if (sessionStorage.getItem('assga_admin_autenticado') === 'true') {
+                document.body.className = 'admin-unlocked';
+                carregarTodosOsCadastros();
+            }
+        });
+    </script>
+</body>
+</html>

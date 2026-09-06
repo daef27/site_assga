@@ -1,0 +1,1 @@
+# ASSGA Django Project Package

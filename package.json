@@ -1,0 +1,26 @@
+{
+  "name": "assga-site",
+  "version": "1.0.0",
+  "description": "ASSGA - Associação Desportiva",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "vite build",
+    "start": "node server.js",
+    "start:prod": "npm run build && NODE_ENV=production node server.js",
+    "lint": "node -e \"console.log('Lint ok')\""
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.2"
+  }
+}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Estatuto Social - ASSGA{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold text-uppercase">Documento Oficial</span>
+                <h2 class="fw-bold text-primary mt-2 mb-0">Estatuto Social da ASSGA</h2>
+                <p class="text-muted small mb-0">Regulamento Interno e Normas da Associação</p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <form method="get" class="d-flex gap-2">
+                    <input type="text" name="q" value="{{ busca }}" class="form-control" placeholder="Buscar artigo ou palavra-chave...">
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search"></i></button>
+                    {% if busca %}
+                    <a href="{% url 'core:estatuto' %}" class="btn btn-outline-secondary">Limpar</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        {% if busca %}
+        <div class="alert alert-info">
+            Resultados da busca por: <strong>"{{ busca }}"</strong>
+        </div>
+        <div class="row g-3">
+            {% for artigo in artigos_filtrados %}
+            <div class="col-12">
+                <div class="card border-0 bg-light p-3 rounded-3">
+                    <h6 class="fw-bold text-primary">{{ artigo.capitulo }} - Artigo {{ artigo.numero }}º</h6>
+                    <p class="mb-1 text-dark">{{ artigo.texto }}</p>
+                    {% if artigo.paragrafo_unico %}
+                    <p class="small text-muted mb-0"><strong>Parágrafo Único:</strong> {{ artigo.paragrafo_unico }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted">Nenhum artigo encontrado com o termo pesquisado.</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        
+        <div class="accordion" id="accordionEstatuto">
+            {% for cap in capitulos %}
+            <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden shadow-sm">
+                <h2 class="accordion-header" id="heading{{ cap.id }}">
+                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} bg-light fw-bold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ cap.id }}">
+                        <i class="fa-solid fa-bookmark text-warning me-2"></i> Capítulo {{ cap.numero }}: {{ cap.titulo }}
+                    </button>
+                </h2>
+                <div id="collapse{{ cap.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionEstatuto">
+                    <div class="accordion-body bg-white">
+                        {% for artigo in cap.artigos.all %}
+                        <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <h6 class="fw-bold text-dark mb-1">Art. {{ artigo.numero }}º</h6>
+                            <p class="mb-1 text-secondary">{{ artigo.texto }}</p>
+                            {% if artigo.paragrafo_unico %}
+                            <div class="p-2 bg-light rounded text-muted small mt-2">
+                                <strong>Parágrafo Único:</strong> {{ artigo.paragrafo_unico }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small">Artigos deste capítulo em fase de consolidação.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-light border text-center py-4">
+                Execute <code>python manage.py seed_assga</code> para carregar os artigos do estatuto.
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
