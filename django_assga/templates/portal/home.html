@@ -80,36 +80,36 @@
         </div>
     </div>
 
-    <!-- Slider de Próximos Eventos -->
+    <!-- Slider de Fotos da ASSGA -->
     <div class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-primary mb-0"><i class="fa-solid fa-calendar-days me-2"></i>Próximos Eventos</h3>
-            <a href="{% url 'core:eventos' %}" class="btn btn-outline-primary btn-sm">Ver Todos</a>
+            <h3 class="fw-bold text-primary mb-0"><i class="fa-solid fa-images me-2"></i>Momentos da ASSGA</h3>
         </div>
-        {% if eventos %}
         <div id="eventosSlider" class="carousel slide carousel-fade shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
             <div class="carousel-indicators">
-                {% for evento in eventos %}
-                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Ir para o evento {{ forloop.counter }}"></button>
-                {% endfor %}
+                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Foto 1"></button>
+                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="1" aria-label="Foto 2"></button>
+                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="2" aria-label="Foto 3"></button>
+                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="3" aria-label="Foto 4"></button>
+                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="4" aria-label="Foto 5"></button>
             </div>
             <div class="carousel-inner">
-                {% for evento in eventos %}
-                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="carousel-item active">
                     <div class="evento-slide d-flex align-items-end">
-                        <img src="{{ evento.imagem_url }}" alt="Imagem do evento {{ evento.titulo }}">
+                        <img src="{% static 'imagens/Assga_foto.jpg' %}" alt="ASSGA em atividade">
                         <div class="evento-slide-overlay"></div>
                         <div class="evento-slide-content text-white p-4 p-md-5">
-                            <div class="d-flex flex-wrap gap-2 mb-2">
-                                <span class="badge bg-danger">{{ evento.tipo }}</span>
-                                {% if evento.libras_disponivel %}
-                                <span class="badge bg-primary"><i class="fa-solid fa-hands-asl-interpreting me-1"></i>LIBRAS</span>
-                                {% endif %}
-                            </div>
-                            <h4 class="fw-bold mb-2">{{ evento.titulo }}</h4>
-                            <p class="small mb-1"><i class="fa-solid fa-calendar me-2"></i>{{ evento.data_inicio|date:"d/m/Y - H:i" }}</p>
-                            <p class="small mb-2"><i class="fa-solid fa-location-dot me-2"></i>{{ evento.local }}</p>
-                            <p class="mb-0 small d-none d-md-block">{{ evento.descricao|truncatewords:24 }}</p>
+                            <h4 class="fw-bold mb-0">ASSGA em atividade</h4>
+                        </div>
+                    </div>
+                </div>
+                {% for imagem, descricao in fotos_assga %}
+                <div class="carousel-item">
+                    <div class="evento-slide d-flex align-items-end">
+                        <img src="{% static imagem %}" alt="{{ descricao }}">
+                        <div class="evento-slide-overlay"></div>
+                        <div class="evento-slide-content text-white p-4 p-md-5">
+                            <h4 class="fw-bold mb-0">{{ descricao }}</h4>
                         </div>
                     </div>
                 </div>
@@ -122,13 +122,6 @@
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
             </button>
         </div>
-        {% else %}
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="alert alert-light border text-center py-4">Nenhum evento agendado no momento. Fique atento às nossas redes!</div>
-            </div>
-        </div>
-        {% endif %}
     </div>
 </div>
 

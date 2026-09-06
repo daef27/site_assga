@@ -28,6 +28,12 @@ def home_view(request):
         'noticias': noticias_destaque,
         'presidencia': membros_presidencia,
         'modalidades': modalidades,
+        'fotos_assga': [
+            ('imagens/foto1.jpg', 'ASSGA e sua comunidade'),
+            ('imagens/foto2.jpg', 'Atividades da ASSGA'),
+            ('imagens/foto3 (1).jpg', 'Esporte e inclusão'),
+            ('imagens/halloween-assga.jpeg', 'Evento da ASSGA'),
+        ],
         'active_page': 'home',
     }
     return render(request, 'portal/home.html', context)
