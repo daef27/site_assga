@@ -15,7 +15,10 @@ from .forms import AssociadoLoginForm, MensagemContatoForm, ComprovanteUploadFor
 
 def home_view(request):
     """Página Inicial com banners, destaques, eventos e notícias da ASSGA."""
-    eventos_destaque = Evento.objects.filter(ativo=True).order_by('data_inicio')[:4]
+    eventos_destaque = Evento.objects.filter(
+        ativo=True,
+        imagem_url__isnull=False,
+    ).exclude(imagem_url='').order_by('data_inicio')[:10]
     noticias_destaque = Noticia.objects.filter(destaque=True)[:3]
     membros_presidencia = MembroDiretoria.objects.filter(cargo__icontains='Presidente')[:2]
     modalidades = ModalidadeEsportiva.objects.filter(ativa=True)

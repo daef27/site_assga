@@ -97,13 +97,7 @@
                 {% for evento in eventos %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <div class="evento-slide d-flex align-items-end">
-                        {% if evento.imagem %}
-                        <img src="{{ evento.imagem.url }}" alt="Imagem do evento {{ evento.titulo }}">
-                        {% elif evento.imagem_url %}
                         <img src="{{ evento.imagem_url }}" alt="Imagem do evento {{ evento.titulo }}">
-                        {% else %}
-                        <img src="{% static 'imagens/Assga_foto.jpg' %}" alt="Logo da ASSGA">
-                        {% endif %}
                         <div class="evento-slide-overlay"></div>
                         <div class="evento-slide-content text-white p-4 p-md-5">
                             <div class="d-flex flex-wrap gap-2 mb-2">

@@ -1,6 +1,7 @@
 {
-  "installCommand": "python -m pip install -r requirements.txt",
+  "installCommand": "python -m pip install --break-system-packages -r requirements.txt",
   "buildCommand": "python django_assga/manage.py collectstatic --noinput",
+  "outputDirectory": "django_assga/staticfiles",
   "rewrites": [
     {
       "source": "/(.*)",
