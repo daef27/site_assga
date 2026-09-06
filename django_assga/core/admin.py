@@ -96,6 +96,7 @@ class MensalidadeAdmin(admin.ModelAdmin):
 @admin.register(MembroDiretoria)
 class MembroDiretoriaAdmin(admin.ModelAdmin):
     list_display = ('ordem', 'cargo', 'nome', 'gestao', 'telefone', 'email')
+    list_display_links = ('nome',)
     list_editable = ('ordem',)
     search_fields = ('nome', 'cargo')
     ordering = ('ordem',)
@@ -133,6 +134,7 @@ class ArtigoEstatutoInline(admin.TabularInline):
 @admin.register(CapituloEstatuto)
 class CapituloEstatutoAdmin(admin.ModelAdmin):
     list_display = ('ordem', 'numero', 'titulo')
+    list_display_links = ('titulo',)
     list_editable = ('ordem',)
     inlines = [ArtigoEstatutoInline]
 

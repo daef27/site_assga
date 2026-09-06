@@ -143,6 +143,7 @@ class Command(BaseCommand):
                 'local': 'Ginásio Poliesportivo de São Gonçalo do Amarante - RN',
                 'descricao': 'Competição que reúne equipes de surdos de várias regiões do Rio Grande do Norte e estados vizinhos.',
                 'libras_disponivel': True,
+                'imagem_url': '/static/imagens/foto1.jpg',
                 'destaque': True,
             },
             {
@@ -152,6 +153,7 @@ class Command(BaseCommand):
                 'local': 'Auditório da Casa de Cultura Municipal',
                 'descricao': 'Palestras, oficinas em LIBRAS, apresentações teatrais e debates sobre acessibilidade e inclusão social.',
                 'libras_disponivel': True,
+                'imagem_url': '/static/imagens/Assga_foto.jpg',
                 'destaque': True,
             },
             {
@@ -161,6 +163,7 @@ class Command(BaseCommand):
                 'local': 'Sede Social da ASSGA',
                 'descricao': 'Apresentação dos balancetes financeiros, relatório de atividades esportivas e deliberações estatutárias.',
                 'libras_disponivel': True,
+                'imagem_url': '/static/imagens/foto2.jpg',
                 'destaque': False,
             }
         ]

@@ -3,6 +3,13 @@
 {% block title %}Agenda de Eventos - ASSGA{% endblock %}
 
 {% block content %}
+<style>
+    .evento-imagem {
+        height: 190px;
+        object-fit: cover;
+    }
+</style>
+
 <div class="container py-3">
     <div class="text-center mb-5">
         <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold text-uppercase">Calendário Oficial</span>
@@ -14,6 +21,11 @@
         {% for evento in eventos %}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                {% if evento.imagem %}
+                <img src="{{ evento.imagem.url }}" class="card-img-top evento-imagem" alt="Imagem do evento {{ evento.titulo }}">
+                {% elif evento.imagem_url %}
+                <img src="{{ evento.imagem_url }}" class="card-img-top evento-imagem" alt="Imagem do evento {{ evento.titulo }}">
+                {% endif %}
                 <div class="card-body p-4 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <span class="badge bg-primary">{{ evento.tipo }}</span>

@@ -80,36 +80,97 @@
         </div>
     </div>
 
-    <!-- Próximos Eventos -->
+    <!-- Slider de Próximos Eventos -->
     <div class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold text-primary mb-0"><i class="fa-solid fa-calendar-days me-2"></i>Próximos Eventos</h3>
             <a href="{% url 'core:eventos' %}" class="btn btn-outline-primary btn-sm">Ver Todos</a>
         </div>
-        <div class="row g-4">
-            {% for evento in eventos %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border shadow-sm rounded-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary">{{ evento.tipo }}</span>
-                            {% if evento.libras_disponivel %}
-                            <span class="badge bg-info text-dark"><i class="fa-solid fa-hands-asl-interpreting me-1"></i>LIBRAS</span>
-                            {% endif %}
+        {% if eventos %}
+        <div id="eventosSlider" class="carousel slide carousel-fade shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for evento in eventos %}
+                <button type="button" data-bs-target="#eventosSlider" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Ir para o evento {{ forloop.counter }}"></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for evento in eventos %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <div class="evento-slide d-flex align-items-end">
+                        {% if evento.imagem %}
+                        <img src="{{ evento.imagem.url }}" alt="Imagem do evento {{ evento.titulo }}">
+                        {% elif evento.imagem_url %}
+                        <img src="{{ evento.imagem_url }}" alt="Imagem do evento {{ evento.titulo }}">
+                        {% else %}
+                        <img src="{% static 'imagens/Assga_foto.jpg' %}" alt="Logo da ASSGA">
+                        {% endif %}
+                        <div class="evento-slide-overlay"></div>
+                        <div class="evento-slide-content text-white p-4 p-md-5">
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <span class="badge bg-danger">{{ evento.tipo }}</span>
+                                {% if evento.libras_disponivel %}
+                                <span class="badge bg-primary"><i class="fa-solid fa-hands-asl-interpreting me-1"></i>LIBRAS</span>
+                                {% endif %}
+                            </div>
+                            <h4 class="fw-bold mb-2">{{ evento.titulo }}</h4>
+                            <p class="small mb-1"><i class="fa-solid fa-calendar me-2"></i>{{ evento.data_inicio|date:"d/m/Y - H:i" }}</p>
+                            <p class="small mb-2"><i class="fa-solid fa-location-dot me-2"></i>{{ evento.local }}</p>
+                            <p class="mb-0 small d-none d-md-block">{{ evento.descricao|truncatewords:24 }}</p>
                         </div>
-                        <h5 class="card-title fw-bold">{{ evento.titulo }}</h5>
-                        <p class="text-muted small mb-2"><i class="fa-solid fa-calendar me-1 text-primary"></i> {{ evento.data_inicio|date:"d/m/Y - H:i" }}</p>
-                        <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ evento.local }}</p>
-                        <p class="card-text text-secondary small">{{ evento.descricao|truncatewords:20 }}</p>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% empty %}
+            <button class="carousel-control-prev" type="button" data-bs-target="#eventosSlider" data-bs-slide="prev" aria-label="Evento anterior">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#eventosSlider" data-bs-slide="next" aria-label="Próximo evento">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+        {% else %}
+        <div class="row g-4">
             <div class="col-12">
                 <div class="alert alert-light border text-center py-4">Nenhum evento agendado no momento. Fique atento às nossas redes!</div>
             </div>
-            {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
+
+<style>
+    .evento-slide {
+        min-height: 390px;
+        position: relative;
+        background: #003366;
+    }
+
+    .evento-slide img,
+    .evento-slide-overlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .evento-slide img {
+        object-fit: cover;
+    }
+
+    .evento-slide-overlay {
+        background: linear-gradient(90deg, rgba(0, 31, 63, 0.95), rgba(0, 51, 102, 0.45));
+    }
+
+    .evento-slide-content {
+        position: relative;
+        z-index: 1;
+        max-width: 760px;
+    }
+
+    @media (max-width: 576px) {
+        .evento-slide {
+            min-height: 330px;
+        }
+    }
+</style>
 {% endblock %}

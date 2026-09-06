@@ -206,7 +206,7 @@ def api_dados_view(request):
             'cnpj': '57.242.499/0001-60',
             'email': 'assgar2019@gmail.com',
             'telefone': '(84) 99698-1248',
-            'chave_pix': 'assgar2019@gmail.com',
+            'chave_pix': 'Polyanabritoflamengobeatriz@gmail.com',
         })
     elif collection == 'associados':
         dados = list(Associado.objects.values(

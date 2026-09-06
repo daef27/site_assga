@@ -16,6 +16,15 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        'CSRF_TRUSTED_ORIGINS',
+        'http://127.0.0.1:8000,http://localhost:8000,https://127.0.0.1:8000,https://localhost:8000,https://*.app.github.dev,https://*.preview.app.github.dev,https://*.githubpreview.dev',
+    ).split(',')
+    if origin.strip()
+]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -109,7 +118,7 @@ ASSGA_CONFIG = {
     'CNPJ': '57.242.499/0001-60',
     'EMAIL': 'assgar2019@gmail.com',
     'TELEFONE': '(84) 99698-1248',
-    'CHAVE_PIX': 'assgar2019@gmail.com',
+    'CHAVE_PIX': 'Polyanabritoflamengobeatriz@gmail.com',
     'ENDERECO': 'Rua da Floresta, 562 - São Gonçalo do Amarante - RN',
     'INSTAGRAM': 'https://www.instagram.com/assga_2019/',
     'YOUTUBE': 'https://www.youtube.com/@ASSGAESPORTES',
