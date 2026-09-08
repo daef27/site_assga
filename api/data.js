@@ -74,14 +74,14 @@ const memoryStore = new Map([
         titulo: 'Presença Digital e Eventos Especiais',
         data: '2026',
         texto: 'Consolidação da presença digital, carteirinhas de sócios e realizações como o 2º Halloween ASSGA.',
-        imagem: 'src/imagens/foto3 (1).jpg'
+        imagem: 'src/imagens/foto3-1.jpg'
       }
     ]
   }],
   ['slider', [
     { imagem: 'src/imagens/foto1.jpg', texto: 'ASSGA - Associação Desportiva' },
     { imagem: 'src/imagens/foto2.jpg', texto: 'Esporte e integração da ASSGA' },
-    { imagem: 'src/imagens/foto3 (1).jpg', texto: 'Futsal e atividades esportivas ASSGA' }
+    { imagem: 'src/imagens/foto3-1.jpg', texto: 'Futsal e atividades esportivas ASSGA' }
   ]]
 ]);
 

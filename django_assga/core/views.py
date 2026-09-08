@@ -31,7 +31,7 @@ def home_view(request):
         'fotos_assga': [
             ('imagens/foto1.jpg', 'ASSGA e sua comunidade'),
             ('imagens/foto2.jpg', 'Atividades da ASSGA'),
-            ('imagens/foto3 (1).jpg', 'Esporte e inclusão'),
+            ('imagens/foto3-1.jpg', 'Esporte e inclusão'),
             ('imagens/halloween-assga.jpeg', 'Evento da ASSGA'),
         ],
         'active_page': 'home',
